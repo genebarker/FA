@@ -150,7 +150,7 @@ function check_data()
 	}
 
 	if (!is_date_in_fiscalyear($_POST['DispatchDate'])) {
-		display_error(_("The entered date of delivery is not in fiscal year."));
+		display_error(_("The entered date of delivery is closed or not in fiscal year."));
 		set_focus('DispatchDate');
 		return false;
 	}

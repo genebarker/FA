@@ -188,7 +188,7 @@ function check_inputs()
 	} 
 	elseif (!is_date_in_fiscalyear($_POST['DatePaid'])) 
 	{
-		display_error(_("The entered date is out of fiscal year or is closed for further data entry."));
+		display_error(_("The entered date is closed or not in fiscal year."));
 		set_focus('DatePaid');
 		return false;
 	}

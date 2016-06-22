@@ -112,6 +112,9 @@ INSERT INTO `0_sys_prefs` SELECT 'default_workorder_required','glsetup.manuf', '
 #INSERT INTO `0_sys_prefs` SELECT 'payroll_act','glsetup.payroll', 'varchar','15', c.payroll_act FROM `0_company` c;
 INSERT INTO `0_sys_prefs` SELECT 'version_id', 'system', 'varchar', '11', c.version_id FROM `0_company` c;
 
+# add gl closing date from FA 2.4
+INSERT INTO `0_sys_prefs` VALUES('gl_closing_date','setup.closing_date', 'date', 8, '');
+
 ALTER TABLE `0_stock_master` ADD COLUMN `editable` TINYINT(1) NOT NULL default '0';
 ALTER TABLE `0_debtor_trans` ADD COLUMN `payment_terms` int(11) default NULL;
 ALTER TABLE `0_sales_orders` ADD COLUMN `payment_terms` int(11) default NULL;

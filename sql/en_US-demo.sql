@@ -2068,6 +2068,9 @@ INSERT INTO `0_sys_prefs` VALUES('auto_curr_reval', 'setup.company', 'smallint',
 INSERT INTO `0_sys_prefs` VALUES('grn_clearing_act', 'glsetup.purchase', 'varchar', 15, '1550');
 INSERT INTO `0_sys_prefs` VALUES('bcc_email', 'setup.company', 'varchar', 100, '');
 
+# add gl closing date from FA 2.4
+INSERT INTO `0_sys_prefs` VALUES('gl_closing_date','setup.closing_date', 'date', 8, '');
+
 -- --------------------------------------------------------
 
 --

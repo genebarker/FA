@@ -358,7 +358,7 @@ function can_process() {
 		return false;
 	}
 	if ($_SESSION['Items']->trans_type!=ST_SALESORDER && $_SESSION['Items']->trans_type!=ST_SALESQUOTE && !is_date_in_fiscalyear($_POST['OrderDate'])) {
-		display_error(_("The entered date is not in fiscal year"));
+		display_error(_("The entered date is closed or not in fiscal year"));
 		set_focus('OrderDate');
 		return false;
 	}

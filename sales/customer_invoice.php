@@ -273,7 +273,7 @@ function check_data()
 	}
 
 	if (!is_date_in_fiscalyear($_POST['InvoiceDate'])) {
-		display_error(_("The entered invoice date is not in fiscal year."));
+		display_error(_("The entered invoice date is closed or not in fiscal year."));
 		set_focus('InvoiceDate');
 		return false;
 	}

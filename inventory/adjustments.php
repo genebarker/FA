@@ -111,7 +111,7 @@ function can_process()
 	} 
 	elseif (!is_date_in_fiscalyear($_POST['AdjDate'])) 
 	{
-		display_error(_("The entered date is not in fiscal year."));
+		display_error(_("The entered date is closed or not in fiscal year."));
 		set_focus('AdjDate');
 		return false;
 	}

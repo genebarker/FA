@@ -183,7 +183,7 @@ function check_data()
 	} 
 	elseif (!is_date_in_fiscalyear($_SESSION['supp_trans']->tran_date)) 
 	{
-		display_error(_("The entered date is not in fiscal year."));
+		display_error(_("The entered date is closed or not in fiscal year."));
 		set_focus('tran_date');
 		return false;
 	}

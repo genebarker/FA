@@ -200,7 +200,13 @@ function is_date_in_fiscalyear($date, $convert=false)
     else
         $date2 = $date;
 
-    if ($_SESSION["wa_current_user"]->can_access('SA_MULTIFISCALYEARS')) // allow all open years for this one
+	// add date close check from FA 2.4
+	// note: however, unlike 2.4.RC1 this check is placed *before* the multi-fiscal years
+	// entry check ... because if the date is closed for entry, it's closed
+	if (is_date_closed($date2))
+		return 0;
+
+	if ($_SESSION["wa_current_user"]->can_access('SA_MULTIFISCALYEARS')) // allow all open years for this one
         return is_date_in_fiscalyears($date2, false); 
 
     $myrow = get_current_fiscalyear();
@@ -214,6 +220,12 @@ function is_date_in_fiscalyear($date, $convert=false)
         return 0;
     }
     return 1;
+}
+
+// add date closed function from FA 2.4
+function is_date_closed($date)
+{
+	return !date1_greater_date2($date, sql2date(get_company_pref('gl_closing_date')));
 }
 
 function begin_fiscalyear()

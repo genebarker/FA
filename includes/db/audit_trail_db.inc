@@ -57,15 +57,20 @@ function get_audit_trail_last($trans_type, $trans_no)
 	Confirm and close for edition all transactions up to date $todate, 
 	and reindex	journal.
 */
+// replace close transactions function with version from FA 2.4
 function close_transactions($todate) {
+
+	begin_transaction();
+
 	$errors = 0;
-	$sql = "SELECT DISTINCT a.id, a.gl_date, a.fiscal_year"
+	// select only those audit trail records which produce any GL postings
+	$sql = "SELECT a.id, gl.tran_date, a.fiscal_year, a.gl_seq,
+		 gl.tran_date <= '". date2sql($todate) ."' as closed"
 		." FROM ".TB_PREF."gl_trans gl"
 		." LEFT JOIN ". TB_PREF."audit_trail a ON 
 			(gl.type=a.type AND gl.type_no=a.trans_no)"
-		. " WHERE gl_date<='". date2sql($todate) ."'"
-		. " AND NOT ISNULL(gl_seq)"
-		. " ORDER BY a.fiscal_year, a.gl_date, a.id";
+		. " WHERE NOT ISNULL(a.gl_seq) AND gl.amount!=0"	// skip old audit records and voided transactions
+		. " GROUP BY  a.id, gl.tran_date, a.fiscal_year, a.gl_seq ORDER BY a.fiscal_year, gl.tran_date, a.id";
 
 	$result = db_query($sql, "Cannot select transactions for closing");
 
@@ -78,19 +83,26 @@ function close_transactions($todate) {
 			}
 			if ($last_year != $row['fiscal_year']) {
 				$last_year = $row['fiscal_year'];
-				$counter = 1; // reset counter on fiscal year change
-			} else
-				$counter++;
-			$sql2 = "UPDATE ".TB_PREF."audit_trail SET"
-				. " gl_seq=$counter"
-				. " WHERE id=".$row['id'];
-											
-			db_query($sql2, "Cannot reindex journal");
+				$counter = 0; // reset counter on fiscal year change
+			}
+
+			$seq = $row['closed'] ? ++$counter : 0;
+			if ($row['gl_seq'] != $seq)	{ // update transaction status only when gl_seq has changed
+				$sql2 = "UPDATE ".TB_PREF."audit_trail SET"
+					. " gl_seq=$seq"
+					. " WHERE id=".$row['id'];
+				db_query($sql2, "Cannot reindex journal");
+			}
 		}
 	}
-	
-	if ($errors) 
+
+	if ($errors)
 		display_warning(_("Some transactions journal GL postings were not indexed due to lack of audit trail record."));
+	else
+		update_company_prefs(array('gl_closing_date'=> date2sql($todate)));
+	commit_transaction();
+
+	return $errors;
 }
 
 /*
@@ -126,15 +138,36 @@ function open_transactions($fromdate) {
 /*
 	Closed transactions have gl_seq number assigned.
 */
-function is_closed_trans($type, $trans_no) {
-	$sql = "SELECT	gl_seq  FROM ".TB_PREF."audit_trail"
+// replace is closed trans function with version from FA 2.4
+// (includes new dependency get_journal_number)
+function get_journal_number($type, $trans_no) {
+
+	$cdate = get_company_pref('gl_closing_date');
+	if (!$cdate)
+		return false;
+
+// FIXME: gl_date can be badly entered for some transactions due to bug in previous FA versions
+	$sql = "SELECT	MAX(gl_seq) as gl_seq  FROM ".TB_PREF."audit_trail"
 		. " WHERE type=".db_escape($type)
 		." AND trans_no=".db_escape($trans_no)
-		." AND gl_seq>0";
-
+		." AND gl_date<='$cdate'"; // date is stored in sql format
+//		." AND (gl_date<='$cdate'" // some transaction can be not sequenced due to 0 amount, however after edition this could change
+//		." OR gl_seq>0)";
 	$res = db_query($sql, "Cannot check transaction");
+	if (db_num_rows($res))
+	{
+		$myrow =db_fetch($res);
+		return $myrow['gl_seq'] ? $myrow['gl_seq'] : _('None');
+	}
+	return "-";
+}
 
-	return db_num_rows($res);
+/*
+	Closed transactions have gl_seq number assigned.
+*/
+function is_closed_trans($type, $trans_no) {
+
+	return get_journal_number($type, $trans_no) > 0;
 }
 
 ?>

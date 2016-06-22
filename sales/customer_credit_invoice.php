@@ -92,7 +92,7 @@ function can_process()
 		set_focus('CreditDate');
 		return false;
 	} elseif (!is_date_in_fiscalyear($_POST['CreditDate']))	{
-		display_error(_("The entered date is not in fiscal year."));
+		display_error(_("The entered date is closed or not in fiscal year."));
 		set_focus('CreditDate');
 		return false;
 	}

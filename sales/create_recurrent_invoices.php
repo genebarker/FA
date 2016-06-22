@@ -118,7 +118,7 @@ if ($id != -1)
 		}
 	}
 	else
-		display_error(_("The entered date is not in fiscal year."));
+		display_error(_("The entered date is closed or not in fiscal year."));
 }
 
 $result = get_recurrent_invoices();

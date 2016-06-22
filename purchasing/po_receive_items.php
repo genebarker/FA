@@ -178,7 +178,7 @@ function can_process()
 
 	if (!is_date_in_fiscalyear($_POST['DefaultReceivedDate'])) 
 	{
-		display_error(_("The entered date is not in fiscal year"));
+		display_error(_("The entered date is closed or not in fiscal year"));
 		set_focus('DefaultReceivedDate');
 		return false;
 	}

@@ -263,7 +263,7 @@ function check_trans()
 	}
 	elseif (!is_date_in_fiscalyear($_POST['date_']))
 	{
-		display_error(_("The entered date is not in fiscal year."));
+		display_error(_("The entered date is closed or not in fiscal year."));
 		set_focus('date_');
 		$input_error = 1;
 	} 

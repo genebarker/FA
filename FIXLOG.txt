@@ -1,3 +1,35 @@
+2016-06-23 12:36:57 +1300 Eugene F. Barker
+Migrate close period function from 2.4 to 2.3.25
+M	admin/void_transaction.php
+M	applications/generalledger.php
+M	gl/bank_transfer.php
+M	gl/gl_bank.php
+A	gl/manage/close_period.php
+M	gl/manage/revaluate_currencies.php
+M	includes/access_levels.inc
+M	includes/date_functions.inc
+M	includes/db/audit_trail_db.inc
+M	inventory/adjustments.php
+M	manufacturing/work_order_add_finished.php
+M	manufacturing/work_order_costs.php
+M	manufacturing/work_order_entry.php
+M	manufacturing/work_order_issue.php
+M	purchasing/po_entry_items.php
+M	purchasing/po_receive_items.php
+M	purchasing/supplier_credit.php
+M	purchasing/supplier_invoice.php
+M	purchasing/supplier_payment.php
+M	sales/create_recurrent_invoices.php
+M	sales/credit_note_entry.php
+M	sales/customer_credit_invoice.php
+M	sales/customer_delivery.php
+M	sales/customer_invoice.php
+M	sales/customer_payments.php
+M	sales/sales_order_entry.php
+M	sql/alter2.3.sql
+M	sql/en_US-demo.sql
+M	sql/en_US-new.sql
+
 2016-06-21 11:13:43 +1300 Eugene F. Barker
 Add error check to make sure old deposit voids
 M	gl/includes/db/gl_db_banking.inc

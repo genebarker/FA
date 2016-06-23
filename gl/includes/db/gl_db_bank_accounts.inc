@@ -342,10 +342,16 @@ function get_bank_account_limit($account, $date, $user=null)
 {
 //	$user = current_user();
 
-	$bankacc = get_bank_account($account);
-	if ($bankacc['account_type'] != BT_CASH)
-		return null;
-	return max(0, get_balance_before_for_bank_account($account, add_days($date,1))); // in case of manco made before the check was implemented
+// remove the 'cash account' safety designed to prevent negative balances in cash accounts
+//
+// reason: it was causing 'The entered transaction does not exist or cannot be voided.' messages
+// in some complex voiding scenarios (when it should not have)
+//
+//	$bankacc = get_bank_account($account);
+//	if ($bankacc['account_type'] != BT_CASH)
+//		return null;
+//	return max(0, get_balance_before_for_bank_account($account, add_days($date,1))); // in case of manco made before the check was implemented
+	return null;
 }
 
 ?>

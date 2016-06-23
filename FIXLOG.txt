@@ -1,3 +1,7 @@
+2016-06-23 16:50:13 +1300 Eugene F. Barker
+Remove 'cash account' safety due to voiding issues
+M	gl/includes/db/gl_db_bank_accounts.inc
+
 2016-06-23 12:36:57 +1300 Eugene F. Barker
 Migrate close period function from 2.4 to 2.3.25
 M	admin/void_transaction.php

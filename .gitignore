@@ -19,3 +19,5 @@ installed_extensions.php
 config.php
 config_db.php
 !index.php
+/.idea
+idea_temp_RemoteResourceRootsList

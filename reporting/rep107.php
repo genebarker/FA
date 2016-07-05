@@ -28,11 +28,13 @@ include_once($path_to_root . "/sales/includes/sales_db.inc");
 
 print_invoices();
 
+$print_as_bill = 0;
+
 //----------------------------------------------------------------------------------------------------
 
 function print_invoices()
 {
-	global $path_to_root, $alternative_tax_include_on_docs, $suppress_tax_rates, $no_zero_lines_amount;
+	global $path_to_root, $alternative_tax_include_on_docs, $suppress_tax_rates, $no_zero_lines_amount, $print_as_bill;
 	
 	include_once($path_to_root . "/reporting/includes/pdf_report.inc");
 
@@ -44,6 +46,10 @@ function print_invoices()
 	$comments = $_POST['PARAM_5'];
 	$customer = $_POST['PARAM_6'];
 	$orientation = $_POST['PARAM_7'];
+	// $print_as_bill
+	// most sales are prepaid, so use prepaid wording by default
+	// unless this option is selected
+	$print_as_bill = $_POST['PARAM_8'];
 
 	if (!$from || !$to) return;
 
@@ -65,7 +71,12 @@ function print_invoices()
 	$cur = get_company_Pref('curr_default');
 
 	if ($email == 0)
-		$rep = new FrontReport(_('INVOICE'), "InvoiceBulk", user_pagesize(), 9, $orientation);
+	{
+		if ($print_as_bill == 0)
+			$rep = new FrontReport(_('VOUCHER'), "InvoiceBulk", user_pagesize(), 9, $orientation);
+		else
+			$rep = new FrontReport(_('INVOICE'), "VoucherBulk", user_pagesize(), 9, $orientation);
+	}
 	if ($orientation == 'L')
 		recalculate_cols($cols);
 	for ($i = $from; $i <= $to; $i++)
@@ -89,9 +100,19 @@ function print_invoices()
 			if ($email == 1)
 			{
 				$rep = new FrontReport("", "", user_pagesize(), 9, $orientation);
-				$rep->title = _('INVOICE');
-				$rep->filename = "Invoice" . $myrow['reference'] . ".pdf";
-			}	
+				if ($print_as_bill == 0)
+				{
+					$rep->title = _('VOUCHER');
+					$rep->filename = "Voucher" . $myrow['reference'] . ".pdf";
+				}
+				else
+				{
+					$rep->title = _("INVOICE");
+					$rep->filename = "Invoice" . $myrow['reference'] . ".pdf";
+				}
+			}
+			else
+				$rep->title = ($print_as_bill==0 ? _("VOUCHER") : _("INVOICE"));
 			$rep->SetHeaderType('Header2');
 			$rep->currency = $cur;
 			$rep->Font();
@@ -201,7 +222,10 @@ function print_invoices()
 			$DisplayTotal = number_format2($sign*($myrow["ov_freight"] + $myrow["ov_gst"] +
 				$myrow["ov_amount"]+$myrow["ov_freight_tax"]),$dec);
 			$rep->Font('bold');
-			$rep->TextCol(3, 6, _("TOTAL INVOICE"), - 2);
+			if ($print_as_bill == 0)
+				$rep->TextCol(3, 6, _("TOTAL"), - 2);
+			else
+				$rep->TextCol(3, 6, _("TOTAL INVOICE"), - 2);
 			$rep->TextCol(6, 7, $DisplayTotal, -2);
 			$words = price_in_words($myrow['Total'], ST_SALESINVOICE);
 			if ($words != "")

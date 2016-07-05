@@ -100,8 +100,9 @@ $reports->addReport(RC_CUSTOMER, 107, _('Print &Invoices'),
 			_('Payment Link') => 'PAYMENT_LINK',
 			_('Comments') => 'TEXTBOX',
 			_('Customer') => 'CUSTOMERS_NO_FILTER',
-			_('Orientation') => 'ORIENTATION'
-));
+			_('Orientation') => 'ORIENTATION',
+			_('Print as Bill') => 'YES_NO'
+	));
 $reports->addReport(RC_CUSTOMER, 113, _('Print &Credit Notes'),
 	array(	_('From') => 'CREDIT',
 			_('To') => 'CREDIT',

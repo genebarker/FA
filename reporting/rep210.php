@@ -159,7 +159,7 @@ function print_remittances()
 				$rep->NewLine();
 				$rep->TextColLines(1, 5, $memo, -2);
 			}
-			$rep->row = $rep->bottomMargin + (16 * $rep->lineHeight);
+			$rep->row = $rep->bottomMargin + (20 * $rep->lineHeight);
 
 			$rep->TextCol(3, 6, _("Total Allocated"), -2);
 			$rep->AmountCol(6, 7, $total_allocated, $dec, -2);
@@ -185,7 +185,12 @@ function print_remittances()
 			{
 				$rep->NewLine(2);
 				$rep->TextCol(1, 7, $myrow['curr_code'] . ": " . $words, - 2);
-			}	
+			}
+			# add signature lines for checking and approval
+			$rep->NewLine(3);
+			$rep->TextCol(1, 6, "Checked by: ________________________________________________   Date: _____________________", -2);
+			$rep->NewLine(3);
+			$rep->TextCol(1, 6, "Approved by: ________________________________________________   Date: _____________________", -2);
 			$rep->Font();
 			if ($email == 1)
 			{

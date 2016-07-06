@@ -34,7 +34,8 @@
 
 		function menu_header($title, $no_menu, $is_index)
 		{
-			global $path_to_root, $help_base_url, $db_connections;
+			// add $version to globals
+			global $path_to_root, $help_base_url, $db_connections, $version;
 			echo "<table class='callout_main' border='0' cellpadding='0' cellspacing='0'>\n";
 			echo "<tr>\n";
 			echo "<td colspan='2' rowspan='2'>\n";
@@ -42,6 +43,8 @@
 			echo "<table class='main_page' border='0' cellpadding='0' cellspacing='0'>\n";
 			echo "<tr>\n";
 			echo "<td>\n";
+			// add SIFA logo to header
+			echo "<div align='center'><img src='$path_to_root/themes/default/images/logo_sifa.png' width='274' height='69' alt='SIFA Logo' /><br>Powered by FrontAccounting v$version</div>\n";
 			echo "<table width='100%' border='0' cellpadding='0' cellspacing='0'>\n";
 			echo "<tr>\n";
 			echo "<td class='quick_menu'>\n"; // tabs
@@ -70,9 +73,15 @@
 
 				echo "<table class='logoutBar'>";
 				echo "<tr><td class='headingtext3'>" . $db_connections[$_SESSION["wa_current_user"]->company]["name"] . " | " . $_SERVER['SERVER_NAME'] . " | " . $_SESSION["wa_current_user"]->name . "</td>";
+				// set wikiauthor cookie
+				$xx_name = "wikiauthor";
+				$xx_value = $_SESSION["wa_current_user"]->name;
+				setcookie($xx_name, $xx_value, 0, "/", ".mysifa.ws");
 				$indicator = "$path_to_root/themes/".user_theme(). "/images/ajax-loader.gif";
 				echo "<td class='logoutBarRight'><img id='ajaxmark' src='$indicator' align='center' style='visibility:hidden;' alt='ajaxmark'></td>";
-				echo "  <td class='logoutBarRight'><a class='shortcut' href='$path_to_root/admin/display_prefs.php?'>" . _("Preferences") . "</a>&nbsp;&nbsp;&nbsp;\n";
+				// provide link to wiki
+				echo "  <td class='logoutBarRight'><a target='_blank' tabindex='-1' href='https://fawiki.mysifa.ws'>" . _("Wiki") . "</a>&nbsp;&nbsp;&nbsp;\n";
+				echo "  <a class='shortcut' href='$path_to_root/admin/display_prefs.php?'>" . _("Preferences") . "</a>&nbsp;&nbsp;&nbsp;\n";
 				echo "  <a class='shortcut' href='$path_to_root/admin/change_current_user_password.php?selected_id=" . $_SESSION["wa_current_user"]->username . "'>" . _("Change password") . "</a>&nbsp;&nbsp;&nbsp;\n";
 
 				if ($help_base_url != null)
@@ -126,7 +135,8 @@
 				echo "<td align='center' class='footer'><a target='_blank' href='$power_url' tabindex='-1'><font color='#ffffff'>$app_title $version - " . _("Theme:") . " " . user_theme() ." - ".show_users_online()."</font></a></td>\n";
 				echo "</tr>\n";
 				echo "<tr>\n";
-				echo "<td align='center' class='footer'><a target='_blank' href='$power_url' tabindex='-1'><font color='#ffff00'>$power_by</font></a></td>\n";
+				// add confidential notice
+				echo "<td align='center' class='footer'><a target='_blank' href='$power_url' tabindex='-1'><font color='#ffff00'>NOTICE: The information in this system is strictly confidential to SIFA and should not be copied, distributed or reproduced in whole or in part, nor passed to any third party.</font></a></td>\n";
 				echo "</tr>\n";
 				if ($allow_demo_mode==true)
 				{

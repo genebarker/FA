@@ -136,7 +136,7 @@
 				echo "</tr>\n";
 				echo "<tr>\n";
 				// add confidential notice
-				echo "<td align='center' class='footer'><a target='_blank' href='$power_url' tabindex='-1'><font color='#ffff00'>NOTICE: The information in this system is strictly confidential to SIFA and should not be copied, distributed or reproduced in whole or in part, nor passed to any third party.</font></a></td>\n";
+				echo "<td align='center' class='footer'><font color='#ffff00'>NOTICE: The information in this system is strictly confidential to SIFA and should not be copied, distributed or reproduced in whole or in part, nor passed to any third party.</font></td>\n";
 				echo "</tr>\n";
 				if ($allow_demo_mode==true)
 				{

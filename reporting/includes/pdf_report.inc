@@ -68,6 +68,8 @@ class FrontReport extends Cpdf
 	var $contactData; // contact data for sending emials/reportlanguage selection
 	
 	var $dest;	// destination: email or printer
+
+	var $showRefBar; // select whether to show reference bar ($header)
 	
 	function FrontReport($title, $filename, $size = 'A4', $fontsize = 9, $orientation = 'P', $margins = NULL, $excelColWidthFactor = NULL)
 	{
@@ -220,6 +222,8 @@ class FrontReport extends Cpdf
 		$this->currency = '';
 		$this->scaleLogoWidth = false; // if Logo, scale on width (else height).
 		$this->SetHeaderType('Header'); // default
+		
+		$this->showRefBar = true;
 
 		$this->Cpdf($size, $_SESSION['language']->code, $orientation);
 	}

@@ -159,7 +159,7 @@ function print_po()
 		}
 		$DisplaySubTot = number_format2($SubTotal,$dec);
 
-		$rep->row = $rep->bottomMargin + (15 * $rep->lineHeight);
+		$rep->row = $rep->bottomMargin + (18 * $rep->lineHeight);
 		$doctype = ST_PURCHORDER;
 
 		$rep->TextCol(3, 6, _("Sub-total"), -2);
@@ -214,11 +214,12 @@ function print_po()
 			$rep->NewLine(1);
 			$rep->TextCol(1, 7, $myrow['curr_code'] . ": " . $words, - 2);
 		}
+
 		# add signature line for approval
+		$rep->NewLine(4);
+		$rep->TextCol(0, 6, "CEO's Signature: ________________________________________________   Date: _____________________", -2);
 		$rep->NewLine(2);
-		$rep->TextCol(1, 5, "CEO's Signature: ________________________________________________   Date: _____________________", -2);
-		$rep->NewLine(2);
-		$rep->TextCol(1, 5, "With above signature, this order has been approved.", -2);
+		$rep->TextCol(0, 6, "With above signature, this order has been approved.", -2);
 		$rep->Font();
 		if ($email == 1)
 		{

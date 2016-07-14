@@ -43,8 +43,8 @@
 			$aux_info = array(
 				_("Customer's Reference") => $this->formData["customer_ref"],
 				_("Sales Person") => get_salesman_name($this->formData['salesman']),
-				_("Your VAT no.") => $this->formData['tax_id'],
-				_("Our Quotation No") => $this->formData['order_no'],
+				_("VAGST No.") => $this->formData['tax_id'],
+				_("Our Quotation No.") => $this->formData['order_no'],
 				_("Valid until") => sql2date($this->formData['delivery_date']),
 			);
 			break;
@@ -60,8 +60,8 @@
 			$aux_info = array(
 				_("Customer's Reference") => $this->formData["customer_ref"],
 				_("Sales Person") => get_salesman_name($this->formData['salesman']),
-				_("Your VAT no.") => $this->formData['tax_id'],
-				_("Our Order No") => $this->formData['order_no'],
+				_("VAGST No.") => $this->formData['tax_id'],
+				_("Our Order No.") => $this->formData['order_no'],
 				_("Delivery Date") => sql2date($this->formData['delivery_date']),
 			);
 			break;
@@ -81,8 +81,8 @@
 			$aux_info = array(
 				_("Customer's Reference") => $this->formData["customer_ref"],
 				_("Sales Person") => get_salesman_name($this->formData['salesman']),
-				_("Your VAT no.") => $this->formData['tax_id'],
-				_("Our Order No") => $ref,
+				_("VAGST No.") => $this->formData['tax_id'],
+				_("Our Order No.") => $ref,
 				_("To Be Invoiced Before") => sql2date($this->formData['due_date']),
 			);
 			break;
@@ -95,17 +95,17 @@
 			$aux_info = array(
 				_("Customer's Reference") => @$this->formData["customer_ref"],
 				_("Sales Person") => get_salesman_name($this->formData['salesman']),
-				_("Your VAT no.") => $this->formData['tax_id'],
-				_("Our Order No") => $this->formData['order_'],
+				_("VAGST No.") => $this->formData['tax_id'],
+				_("Our Order No.") => $this->formData['order_'],
 				_("Due Date") => '',
 			);
 			break;
 
 		case ST_SALESINVOICE:
-			$this->title = ($print_as_bill==0 ? _("VOUCHER") : _("INVOICE"));
-			$this->formData['document_name'] =_("Invoice No.");
+			$this->title = ($print_as_bill==0 ? _("CREDIT RECEIPT") : _("INVOICE"));
+			$this->formData['document_name'] = ($print_as_bill==0 ? _("Credit Receipt No.") : _("Invoice No."));
 			$this->formData['domicile'] = $this->company['domicile'];
-			$Footer[0] = ($print_as_bill==0 ? _("Please quote Invoice no. for inquiry.") : _("Please quote Invoice no. when paying.")). " All amounts stated in - " . $this->formData['curr_code'];
+			$Footer[0] = ($print_as_bill==0 ? _("All amounts stated in - ") : _("Please quote Invoice no. when paying. All amounts stated in - ")) . $this->formData['curr_code'];
 
 			$deliveries = get_sales_parent_numbers(ST_SALESINVOICE, $this->formData['trans_no']);
 			if ($print_invoice_no == 0)
@@ -121,13 +121,22 @@
 				_("Delivery Note No.") => implode(',', $deliveries),
 				_("Due Date") => sql2date($this->formData['due_date']),
 			);
+			if ($print_as_bill == 0)
+			{
+				// don't print reference bar
+				$this->showRefBar = false;
+
+				// don't show discount percentage in header
+				$this->headers = array(_("Item Code"), _("Item Description"), _("Quantity"),
+					_("Unit"), _("Price"), _(" "), _("Total"));
+			}
 			break;
 
 		case ST_SUPPAYMENT:
 			global $systypes_array;
 
-			$this->title = _("REMITTANCE");
-			$this->formData['document_name'] =_("Remittance No.");
+			$this->title = _("PAYMENT VOUCHER");
+			$this->formData['document_name'] =_("Voucher No.");
 			$Addr1['title'] = _("Order To");
 			$Addr1['name'] = $this->formData['supp_name'];
 			$Addr1['address'] = $this->formData['address'];
@@ -138,11 +147,17 @@
 			$aux_info = array(
 				_("Customer's Reference") => $this->formData['supp_account_no'],
 				_("Type") =>$systypes_array[$this->formData["type"]],
-				_("Your VAT no.") => $this->formData['tax_id'],
+				_("VAGST No.") => $this->formData['tax_id'],
 				_("Supplier's Reference") => '',
 				_("Due Date") => sql2date($this->formData['tran_date']),
 			);
-			$this->headers = array(_("Trans Type"), _("#"), _("Date"), _("Due Date"), _("Total Amount"), _("Left to Allocate"), _("This Allocation"));
+
+			// don't print reference bar
+			$this->showRefBar = false;
+
+			// replace old headers
+//			$this->headers = array(_("Trans Type"), _("#"), _("Date"), _("Due Date"), _("Total Amount"), _("Left to Allocate"), _("This Allocation"));
+			$this->headers = array(_("Particulars"), _(" "), _(" "), _(" "), _(" "), _(" "), _("Total"));
 			break;
 
 		case ST_PURCHORDER:
@@ -161,10 +176,13 @@
 			$aux_info = array(
 				_("Customer's Reference") => $this->formData['supp_account_no'],
 				_("Sales Person") => $this->formData['contact'],
-				_("Your VAT no.") => $this->formData['tax_id'],
+				_("VAGST No.") => $this->formData['tax_id'],
 				_("Supplier's Reference") => $this->formData['requisition_no'],
 				_("Order Date") => sql2date($this->formData['document_date']),
 			);
+
+			// don't print reference bar
+			$this->showRefBar = false;
 
 			$this->headers = array(_("Item Code"), _("Item Description"),
 				_("Delivery Date"), _("Quantity"), 	_("Unit"), _("Price"), _("Total"));
@@ -179,8 +197,8 @@
 			$aux_info = array(
 				_("Customer's Reference") => $this->formData["debtor_ref"],
 				_("Type") =>$systypes_array[$this->formData["type"]],
-				_("Your VAT no.") => $this->formData['tax_id'],
-				_("Our Order No") => $this->formData['order_'],
+				_("VAGST No.") => $this->formData['tax_id'],
+				_("Our Order No.") => $this->formData['order_'],
 				_("Due Date") => sql2date($this->formData['tran_date']),
 			);
 			$this->headers = array(_("Trans Type"), _("#"), _("Date"), _("Due Date"), _("Total Amount"), _("Left to Allocate"), _("This Allocation"));
@@ -217,8 +235,8 @@
 			$aux_info = array(
 				_("Customer's Reference") => '',
 				_("Sales Person") => '',
-				_("Your VAT no.") => $this->formData['tax_id'],
-				_("Our Order No") => '',
+				_("VAGST No.") => $this->formData['tax_id'],
+				_("Our Order No.") => '',
 				_("Delivery Date") => '',
 			);
 			$this->headers = array(_("Trans Type"), _("#"), _("Date"), _("DueDate"), _("Charges"),

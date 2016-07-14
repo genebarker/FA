@@ -28,9 +28,40 @@ include_once($path_to_root . "/sales/includes/sales_db.inc");
 
 print_invoices();
 
-$print_as_bill = 0;
-
 //----------------------------------------------------------------------------------------------------
+
+// copy of get_customer_to_order from sales/includes/db/sales_order_db.inc
+// used to get customer's current credit, 'cur_credit' column
+function get_customer_to_order_copy($customer_id) {
+
+	// Now check to ensure this account is not on hold */
+	$sql = "SELECT cust.name, 
+		  cust.address, "
+		.TB_PREF."credit_status.dissallow_invoices, 
+		  cust.sales_type AS salestype,
+		  cust.dimension_id,
+		  cust.dimension2_id,
+		  stype.sales_type,
+		  stype.tax_included,
+		  stype.factor,
+		  cust.curr_code,
+		  cust.discount,
+		  cust.payment_terms,
+		  cust.pymt_discount,
+		  cust.credit_limit - Sum(IFNULL(IF(trans.type=11 OR trans.type=12 OR trans.type=2,
+			-1, 1) * (ov_amount + ov_gst + ov_freight + ov_freight_tax + ov_discount),0)) as cur_credit
+		FROM ".TB_PREF."debtors_master cust
+		  LEFT JOIN ".TB_PREF."debtor_trans trans ON trans.type!=".ST_CUSTDELIVERY." AND trans.debtor_no = cust.debtor_no,"
+		.TB_PREF."credit_status, "
+		.TB_PREF."sales_types stype
+		WHERE cust.sales_type=stype.id
+			AND cust.credit_status=".TB_PREF."credit_status.id
+			AND cust.debtor_no = ".db_escape($customer_id)
+		." GROUP by cust.debtor_no";
+
+	$result =db_query($sql,"Customer Record Retreive");
+	return 	db_fetch($result);
+}
 
 function print_invoices()
 {
@@ -50,6 +81,10 @@ function print_invoices()
 	// most sales are prepaid, so use prepaid wording by default
 	// unless this option is selected
 	$print_as_bill = $_POST['PARAM_8'];
+	if ($_POST['PARAM_8'] == 0)
+		$print_as_bill == 0;
+	else
+		$print_as_bill == 1;
 
 	if (!$from || !$to) return;
 
@@ -73,9 +108,9 @@ function print_invoices()
 	if ($email == 0)
 	{
 		if ($print_as_bill == 0)
-			$rep = new FrontReport(_('VOUCHER'), "InvoiceBulk", user_pagesize(), 9, $orientation);
+			$rep = new FrontReport(_('CREDIT RECEIPT'), "CreditReceiptBulk", user_pagesize(), 9, $orientation);
 		else
-			$rep = new FrontReport(_('INVOICE'), "VoucherBulk", user_pagesize(), 9, $orientation);
+			$rep = new FrontReport(_('INVOICE'), "InvoiceBulk", user_pagesize(), 9, $orientation);
 	}
 	if ($orientation == 'L')
 		recalculate_cols($cols);
@@ -102,8 +137,8 @@ function print_invoices()
 				$rep = new FrontReport("", "", user_pagesize(), 9, $orientation);
 				if ($print_as_bill == 0)
 				{
-					$rep->title = _('VOUCHER');
-					$rep->filename = "Voucher" . $myrow['reference'] . ".pdf";
+					$rep->title = _('CREDIT RECEIPT');
+					$rep->filename = "CreditReceipt" . $myrow['reference'] . ".pdf";
 				}
 				else
 				{
@@ -112,7 +147,7 @@ function print_invoices()
 				}
 			}
 			else
-				$rep->title = ($print_as_bill==0 ? _("VOUCHER") : _("INVOICE"));
+				$rep->title = ($print_as_bill==0 ? _("CREDIT RECEIPT") : _("INVOICE"));
 			$rep->SetHeaderType('Header2');
 			$rep->currency = $cur;
 			$rep->Font();
@@ -234,9 +269,17 @@ function print_invoices()
 				$rep->TextCol(1, 7, $myrow['curr_code'] . ": " . $words, - 2);
 			}
 			$rep->Font();
-			if ($email == 1)
-			{
-				$rep->End($email);
+			// append customer's current credit balance
+			if ($print_as_bill == 0) {
+				$credit_info = get_customer_to_order_copy($myrow['debtor_no']);
+				if (isset($credit_info)) {
+					$rep->NewLine(2);
+					$DisplayCreditBalance = number_format2($credit_info['cur_credit'], $dec);
+					$rep->TextCol(1, 7, "Credit Balance:  " . $DisplayCreditBalance . "      Date:  " . Today() . "  " . Now(), -2);
+				}
+				if ($email == 1) {
+					$rep->End($email);
+				}
 			}
 	}
 	if ($email == 0)

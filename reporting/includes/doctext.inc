@@ -137,10 +137,11 @@
 
 			$this->title = _("PAYMENT VOUCHER");
 			$this->formData['document_name'] =_("Voucher No.");
-			$Addr1['title'] = _("Order To");
+			$Addr1['title'] = _("Paid To");
 			$Addr1['name'] = $this->formData['supp_name'];
 			$Addr1['address'] = $this->formData['address'];
-			$Addr2['title'] = _("Charge To");
+			// don't print address 2
+			$Addr2['title'] = _("");
 			$Addr2['name'] = '';
 			$Addr2['address'] = '';
 
@@ -277,8 +278,9 @@
 		$Footer[_("You can pay through"). " $service: "] = "$url";
 	}
 
-	if ($this->formData['doctype'] == ST_CUSTPAYMENT)
- 		$Footer[] = _("* Subject to Realisation of the Cheque.");
+	// don't print 'subject to' message
+//	if ($this->formData['doctype'] == ST_CUSTPAYMENT)
+// 		$Footer[] = _("* Subject to Realisation of the Cheque.");
 
 	if ($this->params['comments'] != '')
 		$Footer[] = $this->params['comments'];

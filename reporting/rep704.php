@@ -45,22 +45,25 @@ function print_GL_transactions()
 	{
 		$dimension = $_POST['PARAM_4'];
 		$dimension2 = $_POST['PARAM_5'];
-		$comments = $_POST['PARAM_6'];
-		$orientation = $_POST['PARAM_7'];
-		$destination = $_POST['PARAM_8'];
+        $currency = $_POST['PARAM_6'];
+		$comments = $_POST['PARAM_7'];
+		$orientation = $_POST['PARAM_8'];
+		$destination = $_POST['PARAM_9'];
 	}
 	else if ($dim == 1)
 	{
 		$dimension = $_POST['PARAM_4'];
-		$comments = $_POST['PARAM_5'];
-		$orientation = $_POST['PARAM_6'];
-		$destination = $_POST['PARAM_7'];
+        $currency = $_POST['PARAM_5'];
+		$comments = $_POST['PARAM_6'];
+		$orientation = $_POST['PARAM_7'];
+		$destination = $_POST['PARAM_8'];
 	}
 	else
 	{
-		$comments = $_POST['PARAM_4'];
-		$orientation = $_POST['PARAM_5'];
-		$destination = $_POST['PARAM_6'];
+        $currency = $_POST['PARAM_4'];
+		$comments = $_POST['PARAM_5'];
+		$orientation = $_POST['PARAM_6'];
+		$destination = $_POST['PARAM_7'];
 	}
 	if ($destination)
 		include_once($path_to_root . "/reporting/includes/excel_report.inc");
@@ -97,7 +100,8 @@ function print_GL_transactions()
                     	3 => array('text' => _('Dimension')." 1", 'from' => get_dimension_string($dimension),
                             'to' => ''),
                     	4 => array('text' => _('Dimension')." 2", 'from' => get_dimension_string($dimension2),
-                            'to' => ''));
+                            'to' => ''),
+                        5 => array('text' => _('Currency Filter'), 'from' => $currency, 'to' => ''));
     }
     else if ($dim == 1)
     {
@@ -105,13 +109,15 @@ function print_GL_transactions()
     				    1 => array('text' => _('Period'), 'from' => $from, 'to' => $to),
     				    2 => array('text' => _('Accounts'),'from' => $fromacc,'to' => $toacc),
                     	3 => array('text' => _('Dimension'), 'from' => get_dimension_string($dimension),
-                            'to' => ''));
+                            'to' => ''),
+                        4 => array('text' => _('Currency Filter'), 'from' => $currency, 'to' => ''));
     }
     else
     {
     	$params =   array( 	0 => $comments,
     				    1 => array('text' => _('Period'), 'from' => $from, 'to' => $to),
-    				    2 => array('text' => _('Accounts'),'from' => $fromacc,'to' => $toacc));
+    				    2 => array('text' => _('Accounts'),'from' => $fromacc,'to' => $toacc),
+                        3 => array('text' => _('Currency Filter'), 'from' => $currency, 'to' => ''));
     }
     if ($orientation == 'L')
     	recalculate_cols($cols);

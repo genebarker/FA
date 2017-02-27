@@ -30,6 +30,100 @@ print_GL_transactions();
 
 //----------------------------------------------------------------------------------------------------
 
+function get_gl_balance_from_to_with_curr_filter($from_date, $to_date, $account,
+                                                 $dimension=0, $dimension2=0, $currency='')
+{
+    if ($currency=='') // use original
+        return get_gl_balance_from_to($from_date, $to_date, $account, $dimension, $dimension2);
+
+    // use enhanced version with currency filter
+    $from = date2sql($from_date);
+    $to = date2sql($to_date);
+
+    $sql = "SELECT glt.*, COALESCE(ba.bank_curr_code, dtm.curr_code, sp.value) AS curr_code,
+            CASE WHEN glt.amount=0 THEN 0 ELSE COALESCE(bt.amount, glt.amount/dt.rate, glt.amount) END AS curr_amount
+        FROM ".TB_PREF."gl_trans glt
+            LEFT OUTER JOIN ".TB_PREF."bank_accounts ba ON glt.account=ba.account_code
+            LEFT OUTER JOIN ".TB_PREF."bank_trans bt ON glt.type_no=bt.trans_no
+                AND glt.type=bt.type
+                AND bt.bank_act=ba.id
+                AND bt.id IN (SELECT MAX(id) FROM ".TB_PREF."bank_trans GROUP BY type, trans_no, bank_act)
+            LEFT OUTER JOIN ".TB_PREF."debtor_trans dt ON glt.type_no=dt.trans_no AND glt.type=dt.type
+            LEFT OUTER JOIN ".TB_PREF."debtors_master dtm ON dt.debtor_no=dtm.debtor_no,
+            ".TB_PREF."sys_prefs sp
+		WHERE sp.name = 'curr_default'
+		    AND glt.account = '$account'";
+    if ($from_date != "")
+        $sql .= "  AND glt.tran_date > '$from'";
+    if ($to_date != "")
+        $sql .= "  AND glt.tran_date < '$to'";
+    if ($dimension != 0)
+        $sql .= " AND glt.dimension_id = ".($dimension<0?0:db_escape($dimension));
+    if ($dimension2 != 0)
+        $sql .= " AND glt.dimension2_id = ".($dimension2<0?0:db_escape($dimension2));
+
+    $sql2 = "SELECT SUM(curr_amount) FROM (".$sql.") foo WHERE curr_code = '$currency'";
+
+    error_log($sql2);
+
+    $result = db_query($sql2, "The starting balance for account $account could not be calculated");
+
+    $row = db_fetch_row($result);
+    return $row[0];
+}
+
+function get_gl_transactions_with_curr_filter($from_date, $to_date, $trans_no=0,
+                             $account=null, $dimension=0, $dimension2=0, $currency='')
+{
+    if ($currency == '') // use original
+        return get_gl_transactions($from_date, $to_date, -1, $account, $dimension, $dimension2);
+
+    // use enhanced version with currency filter
+    global $show_voided_gl_trans;
+
+    $from = date2sql($from_date);
+    $to = date2sql($to_date);
+
+    $sql = "SELECT glt.*, cm.account_name, COALESCE(ba.bank_curr_code, dtm.curr_code, sp.value) AS curr_code,
+            CASE WHEN glt.amount=0 THEN 0 ELSE COALESCE(bt.amount, glt.amount/dt.rate, glt.amount) END AS curr_amount
+        FROM ".TB_PREF."gl_trans glt
+			LEFT JOIN ".TB_PREF."voided v ON glt.type_no=v.id AND glt.type=v.type
+			LEFT OUTER JOIN ".TB_PREF."bank_accounts ba ON glt.account=ba.account_code
+            LEFT OUTER JOIN ".TB_PREF."bank_trans bt ON glt.type_no=bt.trans_no
+                AND glt.type=bt.type
+                AND bt.bank_act=ba.id
+                AND bt.id IN (SELECT MAX(id) FROM ".TB_PREF."bank_trans GROUP BY type, trans_no, bank_act)
+            LEFT OUTER JOIN ".TB_PREF."debtor_trans dt ON glt.type_no=dt.trans_no AND glt.type=dt.type
+            LEFT OUTER JOIN ".TB_PREF."debtors_master dtm ON dt.debtor_no=dtm.debtor_no,
+            ".TB_PREF."sys_prefs sp,
+            ".TB_PREF."chart_master cm
+		WHERE sp.name = 'curr_default'
+		    AND cm.account_code = glt.account
+		    AND glt.account = '$account'
+		    AND ISNULL(v.date_)
+		    AND glt.tran_date >= '$from'
+		    AND glt.tran_date <= '$to'
+		    AND COALESCE(ba.bank_curr_code, dtm.curr_code, sp.value) = '$currency'";
+
+    if (isset($show_voided_gl_trans) && $show_voided_gl_trans == 0)
+        $sql .= " AND glt.amount <> 0";
+    if ($trans_no > 0)
+        $sql .= " AND glt.type_no LIKE ".db_escape('%'.$trans_no);
+
+    if ($account != null)
+        $sql .= " AND glt.account = ".db_escape($account);
+
+    if ($dimension != 0)
+        $sql .= " AND glt.dimension_id = ".($dimension<0?0:db_escape($dimension));
+
+    if ($dimension2 != 0)
+        $sql .= " AND glt.dimension2_id = ".($dimension2<0?0:db_escape($dimension2));
+
+    $sql .= " ORDER BY glt.tran_date, glt.counter";
+
+    return db_query($sql, "The transactions for could not be retrieved");
+}
+
 function print_GL_transactions()
 {
 	global $path_to_root, $systypes_array;
@@ -139,9 +233,9 @@ function print_GL_transactions()
 				$begin = $from;
 			$begin = add_days($begin, -1);
 		}
-		$prev_balance = get_gl_balance_from_to($begin, $from, $account["account_code"], $dimension, $dimension2);
+		$prev_balance = get_gl_balance_from_to_with_curr_filter($begin, $from, $account["account_code"], $dimension, $dimension2, $currency);
 
-		$trans = get_gl_transactions($from, $to, -1, $account['account_code'], $dimension, $dimension2);
+		$trans = get_gl_transactions_with_curr_filter($from, $to, -1, $account['account_code'], $dimension, $dimension2, $currency);
 		$rows = db_num_rows($trans);
 		if ($prev_balance == 0.0 && $rows == 0)
 			continue;
@@ -159,7 +253,12 @@ function print_GL_transactions()
 		{
 			while ($myrow=db_fetch($trans))
 			{
-				$total += $myrow['amount'];
+			    if ($currency == '')
+			        $row_amount = $myrow['amount'];
+			    else
+			        $row_amount = $myrow['curr_amount'];
+
+				$total += $row_amount;
 
 				$rep->TextCol(0, 1, $systypes_array[$myrow["type"]], -2);
 				$reference = get_reference($myrow["type"], $myrow["type_no"]);
@@ -180,10 +279,10 @@ function print_GL_transactions()
 				else
 					$txt = $memo;
 				$rep->TextCol(6, 7,	$txt, -2);
-				if ($myrow['amount'] > 0.0)
-					$rep->AmountCol(7, 8, abs($myrow['amount']), $dec);
+				if ($row_amount > 0.0)
+					$rep->AmountCol(7, 8, abs($row_amount), $dec);
 				else
-					$rep->AmountCol(8, 9, abs($myrow['amount']), $dec);
+					$rep->AmountCol(8, 9, abs($row_amount), $dec);
 				$rep->TextCol(9, 10, number_format2($total, $dec));
 				$rep->NewLine();
 				if ($rep->row < $rep->bottomMargin + $rep->lineHeight)

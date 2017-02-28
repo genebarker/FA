@@ -349,6 +349,7 @@ if ($dim == 2)
 			_('To Account') => 'GL_ACCOUNTS',
 			_('Dimension')." 1" =>  'DIMENSIONS1',
 			_('Dimension')." 2" =>  'DIMENSIONS2',
+            _('Currency Filter') => 'CURRENCY',
 			_('Comments') => 'TEXTBOX',
 			_('Orientation') => 'ORIENTATION',
 			_('Destination') => 'DESTINATION'));
@@ -402,6 +403,7 @@ else if ($dim == 1)
 			_('From Account') => 'GL_ACCOUNTS',
 			_('To Account') => 'GL_ACCOUNTS',
 			_('Dimension') =>  'DIMENSIONS1',
+            _('Currency Filter') => 'CURRENCY',
 			_('Comments') => 'TEXTBOX',
 			_('Orientation') => 'ORIENTATION',
 			_('Destination') => 'DESTINATION'));
@@ -450,6 +452,7 @@ else
 			_('End Date') => 'DATEENDM',
 			_('From Account') => 'GL_ACCOUNTS',
 			_('To Account') => 'GL_ACCOUNTS',
+            _('Currency Filter') => 'CURRENCY',
 			_('Comments') => 'TEXTBOX',
 			_('Orientation') => 'ORIENTATION',
 			_('Destination') => 'DESTINATION'));

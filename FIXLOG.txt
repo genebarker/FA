@@ -1,6 +1,27 @@
+2017-02-28 12:38:55 +1400 Eugene F. Barker
+Enable currency filter control use
+M	reporting/rep704.php
+
+2017-02-20 07:40:45 +1400 Eugene F. Barker
+Add currency filter control to GL Acc Tran report
+M	reporting/rep704.php
+M	reporting/reports_main.php
+
+2016-07-04 06:48:16 +1300 Eugene F. Barker
+Add PhpStorm files to .gitignore
+M	.gitignore
+
+2016-06-23 17:07:55 +1300 Eugene F. Barker
+Add 'cash account' safety removal to FIXLOG
+M	FIXLOG.txt
+
 2016-06-23 16:50:13 +1300 Eugene F. Barker
 Remove 'cash account' safety due to voiding issues
 M	gl/includes/db/gl_db_bank_accounts.inc
+
+2016-06-23 13:13:04 +1300 Eugene F. Barker
+Update FIXLOG to show contents of previous commit
+M	FIXLOG.txt
 
 2016-06-23 12:36:57 +1300 Eugene F. Barker
 Migrate close period function from 2.4 to 2.3.25
@@ -34,6 +55,6 @@ M	sql/alter2.3.sql
 M	sql/en_US-demo.sql
 M	sql/en_US-new.sql
 
-2016-06-21 11:13:43 +1300 Eugene F. Barker
-Add error check to make sure old deposit voids
-M	gl/includes/db/gl_db_banking.inc
+2016-06-21 16:58:04 +1300 Eugene F. Barker
+Added FILOG.txt to track changes to this branch
+A	FIXLOG.txt

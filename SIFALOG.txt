@@ -1,3 +1,7 @@
+2017-02-28 16:28:17 +1400 Eugene F. Barker
+Add SIFALOG.txt to repository
+A	SIFALOG.txt
+
 2017-02-28 16:08:47 +1400 Eugene F. Barker
 Merge branch 'fixes' into sifa
 
@@ -99,3 +103,7 @@ M	sql/en_US-new.sql
 2016-06-21 16:58:04 +1300 Eugene F. Barker
 Added FILOG.txt to track changes to this branch
 A	FIXLOG.txt
+
+2016-06-21 11:13:43 +1300 Eugene F. Barker
+Add error check to make sure old deposit voids
+M	gl/includes/db/gl_db_banking.inc

@@ -99,7 +99,6 @@ function get_gl_transactions_with_curr_filter($from_date, $to_date, $trans_no=0,
             ".TB_PREF."chart_master cm
 		WHERE sp.name = 'curr_default'
 		    AND cm.account_code = glt.account
-		    AND glt.account = '$account'
 		    AND ISNULL(v.date_)
 		    AND glt.tran_date >= '$from'
 		    AND glt.tran_date <= '$to'
@@ -177,14 +176,14 @@ function print_GL_transactions()
 	$aligns = array('left', 'left', 'left',	'left',	'left',	'left',	'left',	'right', 'right', 'right');
 
 	if ($dim == 2)
-		$headers = array(_('Type'),	_('Ref'), _('#'),	_('Date'), _('Dimension')." 1", _('Dimension')." 2",
+		$headers = array(_('Type'),	_('Ref'), _('#'), _('Date'), _('Dimension')." 1", _('Dimension')." 2",
 			_('Person/Item'), _('Debit'),	_('Credit'), _('Balance'));
 	elseif ($dim == 1)
-		$headers = array(_('Type'),	_('Ref'), _('#'),	_('Date'), _('Dimension'), "", _('Person/Item'),
+		$headers = array(_('Type'),	_('Ref'), _('#'), _('Date'), _('Dimension'), _('Person/Item'), "",
 			_('Debit'),	_('Credit'), _('Balance'));
 	else
-		$headers = array(_('Type'),	_('Ref'), _('#'),	_('Date'), "", "", _('Person/Item'),
-			_('Debit'),	_('Credit'), _('Balance'));
+		$headers = array(_('Type'),	_('Ref'), _('#'), _('Date'), _('Person/Item'), "", "",
+            _('Debit'),	_('Credit'), _('Balance'));
 
 	if ($dim == 2)
 	{
@@ -278,7 +277,7 @@ function print_GL_transactions()
 				}
 				else
 					$txt = $memo;
-				$rep->TextCol(6, 7,	$txt, -2);
+				$rep->TextCol((4 + $dim), 7, $txt, -2);
 				if ($row_amount > 0.0)
 					$rep->AmountCol(7, 8, abs($row_amount), $dec);
 				else

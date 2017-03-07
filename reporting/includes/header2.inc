@@ -139,23 +139,31 @@
 			$this->Text($c2col, $this->company['domicile'], $mcol);
 			$this->NewLine();
 		}
+
+		// Printing info
 		$this->Font();
 		$this->row = $adrline;
-		$this->NewLine(3);
-		$this->Text($mcol + 100, _("Date"));
-		$this->Text($mcol + 180, sql2date($this->formData['document_date']));
-
+		$dinfo_col_1 = $mcol + 80;
+		$dinfo_col_2 = $dinfo_col_1 + 80;
+		$this->NewLine(2);
+		$this->Text($dinfo_col_1, _("Date"));
+		$this->Text($dinfo_col_2, sql2date($this->formData['document_date']));
 		$this->NewLine();
-		$this->Text($mcol + 100, $this->formData['document_name']);
-		$this->Text($mcol + 180, $this->formData['document_number']);
+		$this->Text($dinfo_col_1, $this->formData['document_name']);
+		$this->Text($dinfo_col_2, $this->formData['document_number']);
 		$this->NewLine();
-		$this->Font('italic');
-		$this->Text($mcol + 100, $this->user);
-		$this->Font();
+		if (@$this->formData['preparer_name'])
+		{
+			$this->Text($dinfo_col_1, _("Prepared by"));
+			$this->Text($dinfo_col_2, $this->formData['preparer_name']);
+		}
+		$this->NewLine();
+		$this->Text($dinfo_col_1, _("Printed by"));
+		$this->Text($dinfo_col_2, $this->user);
 		$this->NewLine();
 	
 		if ($this->pageNumber > 1)
-			$this->Text($mcol + 180, _("Page") . ' ' . $this->pageNumber);
+			$this->Text($dinfo_col_2, _("Page") . ' ' . $this->pageNumber);
 		$this->row = $iline1 - $this->lineHeight;
 		$this->fontSize -= 4;
 		$this->Text($ccol, $Addr1['title'], $icol);

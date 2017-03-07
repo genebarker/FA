@@ -164,6 +164,19 @@ function get_gl_trans($type, $trans_id)
 
 //--------------------------------------------------------------------------------
 
+function get_gl_trans_user_real_name($type, $trans_id)
+{
+    $sql = "SELECT atr.type, atr.trans_no, u.real_name
+        FROM ".TB_PREF."audit_trail atr
+        LEFT JOIN ".TB_PREF."users u ON atr.user = u.id
+        WHERE atr.type = ".db_escape($type)." AND atr.trans_no = ".db_escape($trans_id);
+    $result = db_query($sql, "The gl transaction's user name could not be retrieved");
+    $row = db_fetch($result);
+    return $row["real_name"];
+}
+
+//--------------------------------------------------------------------------------
+
 function get_gl_wo_cost_trans($trans_id, $person_id=-1)
 {
 	$sql = "SELECT ".TB_PREF."gl_trans.*, ".TB_PREF."chart_master.account_name FROM "

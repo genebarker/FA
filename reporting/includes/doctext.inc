@@ -104,6 +104,7 @@
 		case ST_SALESINVOICE:
 			$this->title = ($print_as_bill==0 ? _("CREDIT RECEIPT") : _("INVOICE"));
 			$this->formData['document_name'] = ($print_as_bill==0 ? _("Credit Receipt No.") : _("Invoice No."));
+			$this->formData['preparer_name'] = get_gl_trans_user_real_name($this->formData['type'], $this->formData['trans_no']);
 			$this->formData['domicile'] = $this->company['domicile'];
 			$Footer[0] = ($print_as_bill==0 ? _("All amounts stated in - ") : _("Please quote Invoice no. when paying. All amounts stated in - ")) . $this->formData['curr_code'];
 
@@ -137,6 +138,7 @@
 
 			$this->title = _("PAYMENT VOUCHER");
 			$this->formData['document_name'] =_("Voucher No.");
+            $this->formData['preparer_name'] = get_gl_trans_user_real_name($this->formData['type'], $this->formData['trans_no']);
 			$Addr1['title'] = _("Paid To");
 			$Addr1['name'] = $this->formData['supp_name'];
 			$Addr1['address'] = $this->formData['address'];
@@ -194,6 +196,7 @@
 
 			$this->title = _("RECEIPT");
 			$this->formData['document_name'] =_("Receipt No.");
+            $this->formData['preparer_name'] = get_gl_trans_user_real_name($this->formData['type'], $this->formData['trans_no']);
 			$Addr1['title'] = _("With thanks from");
 			$aux_info = array(
 				_("Customer's Reference") => $this->formData["debtor_ref"],

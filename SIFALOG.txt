@@ -1,3 +1,20 @@
+2017-03-08 10:44:52 +1400 Eugene F. Barker
+Add preparer name to reports
+M       gl/includes/db/gl_db_trans.inc
+M       reporting/includes/doctext.inc
+M       reporting/includes/header2.inc
+
+2017-03-06 12:38:09 +1400 Eugene F. Barker
+Merge branch 'fixes' into sifa
+
+2017-03-06 12:09:23 +1400 Eugene F. Barker
+Update FIXLOG to include latest changes
+M       FIXLOG.txt
+
+2017-03-06 11:31:46 +1400 Eugene F. Barker
+Improve GL tran report layout and fix query
+M       reporting/rep704.php
+
 2017-02-28 16:28:17 +1400 Eugene F. Barker
 Add SIFALOG.txt to repository
 A	SIFALOG.txt

@@ -79,15 +79,15 @@ function get_transactions($debtorno, $from, $to)
 
 function print_customer_balances()
 {
-    	global $path_to_root, $systypes_array;
+   	global $path_to_root, $systypes_array;
 
-    	$from = $_POST['PARAM_0'];
-    	$to = $_POST['PARAM_1'];
-    	$fromcust = $_POST['PARAM_2'];
-    	$show_balance = $_POST['PARAM_3'];
-    	$currency = $_POST['PARAM_4'];
-    	$no_zeros = $_POST['PARAM_5'];
-    	$comments = $_POST['PARAM_6'];
+   	$from = $_POST['PARAM_0'];
+   	$to = $_POST['PARAM_1'];
+   	$fromcust = $_POST['PARAM_2'];
+   	$show_balance = $_POST['PARAM_3'];
+   	$currency = $_POST['PARAM_4'];
+   	$no_zeros = $_POST['PARAM_5'];
+   	$comments = $_POST['PARAM_6'];
 	$orientation = $_POST['PARAM_7'];
 	$destination = $_POST['PARAM_8'];
 	if ($destination)
@@ -100,7 +100,8 @@ function print_customer_balances()
 		$cust = _('All');
 	else
 		$cust = get_customer_name($fromcust);
-    	$dec = user_price_dec();
+
+    $dec = user_price_dec();
 
 	if ($currency == ALL_TEXT)
 	{
@@ -113,13 +114,14 @@ function print_customer_balances()
 	if ($no_zeros) $nozeros = _('Yes');
 	else $nozeros = _('No');
 
+	// display regular values in balance column as positive numbers
+	$sign = -1;
+
 	$cols = array(0, 100, 130, 190,	250, 320, 385, 450,	515);
 
 	$headers = array(_('Trans Type'), _('#'), _('Date'), _('Due Date'), _('Charges'), _('Credits'),
-		_('Allocated'), 	_('Outstanding'));
+		_('Allocated'), 	_('Balance'));
 
-	if ($show_balance)
-		$headers[7] = _('Balance');
 	$aligns = array('left',	'left',	'left',	'left',	'right', 'right', 'right', 'right');
 
     $params =   array( 	0 => $comments,
@@ -174,7 +176,7 @@ function print_customer_balances()
 		$rep->AmountCol(4, 5, $init[0], $dec);
 		$rep->AmountCol(5, 6, $init[1], $dec);
 		$rep->AmountCol(6, 7, $init[2], $dec);
-		$rep->AmountCol(7, 8, $init[3], $dec);
+		$rep->AmountCol(7, 8, $sign*$init[3], $dec);
 		$total = array(0,0,0,0);
 		for ($i = 0; $i < 4; $i++)
 		{
@@ -192,7 +194,7 @@ function print_customer_balances()
 			if ($no_zeros && floatcmp($trans['TotalAmount'], $trans['Allocated']) == 0) continue;
 			$rep->NewLine(1, 2);
 			$rep->TextCol(0, 1, $systypes_array[$trans['type']]);
-			$rep->TextCol(1, 2,	$trans['reference']);
+			$rep->TextCol(1, 2,	$trans['trans_no']);
 			$rep->DateCol(2, 3,	$trans['tran_date'], true);
 			if ($trans['type'] == ST_SALESINVOICE)
 				$rep->DateCol(3, 4,	$trans['due_date'], true);
@@ -218,9 +220,9 @@ function print_customer_balances()
 			else	
 				$item[3] = $item[0] - $item[1] + $item[2];
 			if ($show_balance)	
-				$rep->AmountCol(7, 8, $accumulate, $dec);
+				$rep->AmountCol(7, 8, $sign*$accumulate, $dec);
 			else	
-				$rep->AmountCol(7, 8, $item[3], $dec);
+				$rep->AmountCol(7, 8, $sign*$item[3], $dec);
 			for ($i = 0; $i < 4; $i++)
 			{
 				$total[$i] += $item[$i];
@@ -233,7 +235,7 @@ function print_customer_balances()
 		$rep->NewLine(2);
 		$rep->TextCol(0, 3, _('Total'));
 		for ($i = 0; $i < 4; $i++)
-			$rep->AmountCol($i + 4, $i + 5, $total[$i], $dec);
+			$rep->AmountCol($i + 4, $i + 5, $i==3 ? $sign*$total[$i] : $total[$i], $dec);
    		$rep->Line($rep->row  - 4);
    		$rep->NewLine(2);
 	}
@@ -243,7 +245,7 @@ function print_customer_balances()
 	if ($show_balance)
 		$grandtotal[3] = $grandtotal[0] - $grandtotal[1];
 	for ($i = 0; $i < 4; $i++)
-		$rep->AmountCol($i + 4, $i + 5, $grandtotal[$i], $dec);
+		$rep->AmountCol($i + 4, $i + 5, $i==3 ? $sign*$grandtotal[$i] : $grandtotal[$i], $dec);
 	$rep->Line($rep->row  - 4);
 	$rep->NewLine();
     	$rep->End();

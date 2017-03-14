@@ -37,8 +37,10 @@ function get_remittance($type, $trans_no)
    		".TB_PREF."supp_trans.ov_discount,
    		".TB_PREF."suppliers.supp_name,  ".TB_PREF."suppliers.supp_account_no, 
    		".TB_PREF."suppliers.curr_code, ".TB_PREF."suppliers.payment_terms, ".TB_PREF."suppliers.gst_no AS tax_id, 
-   		".TB_PREF."suppliers.address
-		FROM ".TB_PREF."supp_trans, ".TB_PREF."suppliers
+   		".TB_PREF."suppliers.address, ".TB_PREF."bank_trans.cheque_no
+		FROM ".TB_PREF."supp_trans LEFT OUTER JOIN ".TB_PREF."bank_trans ON 
+		    ".TB_PREF."supp_trans.trans_no = ".TB_PREF."bank_trans.trans_no AND
+		     ".TB_PREF."supp_trans.type = ".TB_PREF."bank_trans.type, ".TB_PREF."suppliers
 		WHERE ".TB_PREF."supp_trans.supplier_id = ".TB_PREF."suppliers.supplier_id
 		AND ".TB_PREF."supp_trans.type = ".db_escape($type)."
 		AND ".TB_PREF."supp_trans.trans_no = ".db_escape($trans_no);
@@ -159,7 +161,7 @@ function print_remittances()
 				$rep->NewLine();
 				$rep->TextColLines(0, 6, $memo, -2);
 			}
-			$rep->row = $rep->bottomMargin + (18 * $rep->lineHeight);
+			$rep->row = $rep->bottomMargin + (20 * $rep->lineHeight);
 
 			// remove allocation totals
 //			$rep->TextCol(3, 6, _("Total Allocated"), -2);
@@ -181,6 +183,10 @@ function print_remittances()
 			$rep->TextCol(4, 6, _("TOTAL"), - 2);
 			$rep->AmountCol(6, 7, $myrow['Total'], $dec, -2);
 
+			if ($myrow['cheque_no'] != null) {
+			    $rep->NewLine(2);
+                $rep->TextCol(0, 6, "Cheque No: " . $myrow['cheque_no'], - 2);
+            }
 			$words = price_in_words($myrow['Total'], ST_SUPPAYMENT);
 			if ($words != "")
 			{

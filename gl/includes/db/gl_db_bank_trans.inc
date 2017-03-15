@@ -16,7 +16,7 @@
 // $date_ is display date (non-sql)
 
 function add_bank_trans($type, $trans_no, $bank_act, $ref, $date_,
-	$amount, $person_type_id, $person_id, $currency="", $err_msg="", $rate=0)
+	$amount, $person_type_id, $person_id, $currency="", $err_msg="", $rate=0, $cheque_no="")
 {
 	$sqlDate = date2sql($date_);
 
@@ -37,12 +37,14 @@ function add_bank_trans($type, $trans_no, $bank_act, $ref, $date_,
 	// Also store the rate to the home
 	//$BankToHomeCurrencyRate = get_exchange_rate_to_home_currency($bank_account_currency, $date_);
 
+	$formatted_cheque_no = $cheque_no == "" ? "NULL" : db_escape($cheque_no);
+
 	$sql = "INSERT INTO ".TB_PREF."bank_trans (type, trans_no, bank_act, ref,
-		trans_date, amount, person_type_id, person_id) ";
+		trans_date, amount, person_type_id, person_id, cheque_no) ";
 
 	$sql .= "VALUES ($type, $trans_no, '$bank_act', ".db_escape($ref).", '$sqlDate',
 		".db_escape($amount_bank).", ".db_escape($person_type_id)
-		.", ". db_escape($person_id).")";
+		.", ". db_escape($person_id).", $formatted_cheque_no)";
 
 	if ($err_msg == "")
 		$err_msg = "The bank transaction could not be inserted";
@@ -52,11 +54,24 @@ function add_bank_trans($type, $trans_no, $bank_act, $ref, $date_,
 
 //----------------------------------------------------------------------------------------
 
+function cheque_used_for_bank_trans($cheque_no, $bank_account)
+{
+	$sql = "SELECT trans_no FROM ".TB_PREF."bank_trans
+		WHERE cheque_no = " . db_escape($cheque_no) . "
+		AND amount != 0
+		AND bank_act = " . db_escape($bank_account);
+    $result = db_query($sql, "Cannot search for cheque in bank transactions");
+
+    return (db_num_rows($result) > 0);
+}
+
+//----------------------------------------------------------------------------------------
+
 function exists_bank_trans($type, $type_no)
 {
 	$sql = "SELECT trans_no FROM ".TB_PREF."bank_trans WHERE type=".db_escape($type)
 		." AND trans_no=".db_escape($type_no);
-	$result = db_query($sql, "Cannot retreive a bank transaction");
+	$result = db_query($sql, "Cannot retrieve a bank transaction");
 
     return (db_num_rows($result) > 0);
 }

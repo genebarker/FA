@@ -171,6 +171,7 @@ function create_cart($type, $trans_no)
 
 		$cart->memo_ = get_comments_string($type, $trans_no);
 		$cart->tran_date = sql2date($bank_trans['trans_date']);
+		$cart->cheque = $bank_trans['cheque_no'];
 		$cart->reference = $Refs->get($type, $trans_no);
 
 		$cart->original_amount = $bank_trans['amount'];
@@ -178,7 +179,7 @@ function create_cart($type, $trans_no)
 		if ($result) {
 			while ($row = db_fetch($result)) {
 				if (is_bank_account($row['account'])) {
-					// date exchange rate is currenly not stored in bank transaction,
+					// date exchange rate is currently not stored in bank transaction,
 					// so we have to restore it from original gl amounts
 					$ex_rate = $bank_trans['amount']/$row['amount'];
 				} else {
@@ -201,6 +202,7 @@ function create_cart($type, $trans_no)
 	}
 
 	$_POST['memo_'] = $cart->memo_;
+	$_POST['cheque_no'] = $cart->cheque;
 	$_POST['ref'] = $cart->reference;
 	$_POST['date_'] = $cart->tran_date;
 
@@ -243,6 +245,20 @@ function check_trans()
 		set_focus('amount');
 		$input_error = 1;
 	}
+	$payment_tran = $_SESSION['pay_items']->trans_type == ST_BANKPAYMENT;
+    if ($payment_tran && is_a_chequing_account($_POST['bank_account'])) {
+    	$cheque_ = trim($_POST['cheque_no']);
+    	if (strlen($cheque_) <= 0) {
+            display_error(_("You must enter a cheque number."));
+            set_focus('cheque_no');
+            $input_error = 1;
+        }
+        elseif (cheque_used_for_bank_trans($cheque_, $_POST['bank_account'])) {
+    		display_error(_("The entered cheque number is already in use."));
+    		set_focus('cheque_no');
+    		$input_error = 1;
+		}
+    }
 	if (!$Refs->is_valid($_POST['ref']))
 	{
 		display_error( _("You must enter a reference."));
@@ -301,7 +317,8 @@ if (isset($_POST['Process']) && !check_trans())
 		$_SESSION['pay_items']->trans_type, $_SESSION['pay_items']->order_id, $_POST['bank_account'],
 		$_SESSION['pay_items'], $_POST['date_'],
 		$_POST['PayType'], $_POST['person_id'], get_post('PersonDetailID'),
-		$_POST['ref'], $_POST['memo_'], true, input_num('settled_amount', null));
+		$_POST['ref'], $_POST['memo_'], true, input_num('settled_amount', null),
+		$_POST['cheque_no'] == null ? "" : trim($_POST['cheque_no']));
 
 	$trans_type = $trans[0];
    	$trans_no = $trans[1];

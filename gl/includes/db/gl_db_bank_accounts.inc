@@ -76,6 +76,14 @@ function get_bank_account($id)
 
 //---------------------------------------------------------------------------------------------
 
+function is_a_chequing_account($id)
+{
+    $bank_account = get_bank_account($id);
+    return ($bank_account['account_type'] == BT_CHEQUE);
+}
+
+//---------------------------------------------------------------------------------------------
+
 function get_bank_accounts($show_inactive=false)
 {
 	$sql = "SELECT account.*, gl_account.account_name 

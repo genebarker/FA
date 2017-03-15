@@ -22,7 +22,6 @@ function display_bank_header(&$order)
 	table_section(1);
 	
     date_row(_("Date:"), 'date_', '', true, 0, 0, 0, null, true);
-
 	ref_row(_("Reference:"), 'ref', '');
 
 	table_section(2, "33%");
@@ -118,10 +117,13 @@ function display_bank_header(&$order)
 	}		
     
     bank_accounts_list_row( $payment ? _("From:") : _("Into:"), 'bank_account', null, true);
-    if ($payment)
-		bank_balance_row($_POST['bank_account']);
+    if ($payment) {
+        if (is_a_chequing_account($_POST['bank_account']))
+            ref_row(_("Cheque no:"), 'cheque_no', '');
+        bank_balance_row($_POST['bank_account']);
+    }
 
-	$bank_currency = get_bank_account_currency($_POST['bank_account']);
+        $bank_currency = get_bank_account_currency($_POST['bank_account']);
 
 	exchange_rate_display(get_company_currency(), $bank_currency, $_POST['date_']);
 

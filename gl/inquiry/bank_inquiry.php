@@ -67,7 +67,7 @@ display_heading($act['bank_account_name']." - ".$act['bank_curr_code']);
 
 start_table(TABLESTYLE);
 
-$th = array(_("Type"), _("#"), _("Reference"), _("Date"),
+$th = array(_("Type"), _("#"), _("Ref"), _("Cheque"), _("Date"),
 	_("Debit"), _("Credit"), _("Balance"), _("Person/Item"), _("Memo"), "");
 table_header($th);
 
@@ -75,7 +75,7 @@ $bfw = get_balance_before_for_bank_account($_POST['bank_account'], $_POST['Trans
 
 $credit = $debit = 0;
 start_row("class='inquirybg' style='font-weight:bold'");
-label_cell(_("Opening Balance")." - ".$_POST['TransAfterDate'], "colspan=4");
+label_cell(_("Opening Balance")." - ".$_POST['TransAfterDate'], "colspan=5");
 display_debit_or_credit_cells($bfw);
 label_cell("");
 label_cell("", "colspan=2");
@@ -99,6 +99,7 @@ while ($myrow = db_fetch($result))
 	label_cell($systypes_array[$myrow["type"]]);
 	label_cell(get_trans_view_str($myrow["type"],$myrow["trans_no"]));
 	label_cell(get_trans_view_str($myrow["type"],$myrow["trans_no"],$myrow['ref']));
+	label_cell($myrow["cheque_no"]);
 	label_cell($trandate);
 	display_debit_or_credit_cells($myrow["amount"]);
 	amount_cell($running_total);
@@ -121,7 +122,7 @@ while ($myrow = db_fetch($result))
 //end of while loop
 
 start_row("class='inquirybg' style='font-weight:bold'");
-label_cell(_("Ending Balance")." - ". $_POST['TransToDate'], "colspan=4");
+label_cell(_("Ending Balance")." - ". $_POST['TransToDate'], "colspan=5");
 amount_cell($debit);
 amount_cell(-$credit);
 //display_debit_or_credit_cells($running_total);

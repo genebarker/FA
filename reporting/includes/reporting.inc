@@ -93,6 +93,7 @@ function print_document_link($doc_no, $link_text, $link=true, $type_no,
 				'PARAM_3' => '',
 				'PARAM_4' => $def_orientation);
 			break;
+        case ST_BANKPAYMENT :
 		case ST_SUPPAYMENT :
 			$rep = 210;
 			// from, to, currency, email, comments, orientation

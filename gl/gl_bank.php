@@ -78,7 +78,7 @@ if (isset($_GET['AddedID']))
 	display_note(get_gl_view_str($trans_type, $trans_no, _("&View the GL Postings for this Payment")));
 
     if ($_GET['PayType']==PT_SUPPLIER)
- 	   display_note(print_document_link($trans_no."-".ST_BANKPAYMENT, _("&Print this Payment"), true, ST_SUPPAYMENT), 1, 0);
+ 	   display_note(print_document_link($trans_no."-".ST_BANKPAYMENT, _("&Print this Payment"), true, ST_BANKPAYMENT), 1, 0);
 
     hyperlink_params($_SERVER['PHP_SELF'], _("Enter a &New Payment"), "NewPayment=yes");
 
@@ -98,9 +98,12 @@ if (isset($_GET['UpdatedID']))
 
 	display_note(get_gl_view_str($trans_type, $trans_no, _("&View the GL Postings for this Payment")));
 
-	hyperlink_params($_SERVER['PHP_SELF'], _("Enter Another &Payment"), "NewPayment=yes");
+    if ($_GET['PayType']==PT_SUPPLIER)
+        display_note(print_document_link($trans_no."-".ST_BANKPAYMENT, _("&Print this Payment"), true, ST_BANKPAYMENT), 1, 0);
 
-	hyperlink_params($_SERVER['PHP_SELF'], _("Enter A &Deposit"), "NewDeposit=yes");
+	hyperlink_params($_SERVER['PHP_SELF'], _("Enter a &New Payment"), "NewPayment=yes");
+
+	hyperlink_params($_SERVER['PHP_SELF'], _("Enter a &Deposit"), "NewDeposit=yes");
 
 	display_footer_exit();
 }

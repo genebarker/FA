@@ -24,6 +24,8 @@ include_once($path_to_root . "/gl/includes/gl_db.inc");
 include_once($path_to_root . "/gl/includes/gl_ui.inc");
 include_once($path_to_root . "/admin/db/attachments_db.inc");
 
+include_once($path_to_root . "/reporting/includes/reporting.inc");
+
 $js = '';
 if ($use_popup_windows)
 	$js .= get_js_open_window(800, 500);
@@ -75,9 +77,12 @@ if (isset($_GET['AddedID']))
 
 	display_note(get_gl_view_str($trans_type, $trans_no, _("&View the GL Postings for this Payment")));
 
-	hyperlink_params($_SERVER['PHP_SELF'], _("Enter Another &Payment"), "NewPayment=yes");
+    if ($_GET['PayType']==PT_SUPPLIER)
+ 	   display_note(print_document_link($trans_no."-".ST_BANKPAYMENT, _("&Print this Payment"), true, ST_SUPPAYMENT), 1, 0);
 
-	hyperlink_params($_SERVER['PHP_SELF'], _("Enter A &Deposit"), "NewDeposit=yes");
+    hyperlink_params($_SERVER['PHP_SELF'], _("Enter a &New Payment"), "NewPayment=yes");
+
+	hyperlink_params($_SERVER['PHP_SELF'], _("Enter a &Deposit"), "NewDeposit=yes");
 
 	hyperlink_params("$path_to_root/admin/attachments.php", _("Add an Attachment"), "filterType=$trans_type&trans_no=$trans_no");
 
@@ -253,7 +258,7 @@ function check_trans()
             set_focus('cheque_no');
             $input_error = 1;
         }
-        elseif (cheque_used_for_bank_trans($cheque_, $_POST['bank_account'])) {
+        elseif ($cheque_ != $_SESSION['pay_items']->cheque && cheque_used_for_bank_trans($cheque_, $_POST['bank_account'])) {
     		display_error(_("The entered cheque number is already in use."));
     		set_focus('cheque_no');
     		$input_error = 1;
@@ -322,6 +327,7 @@ if (isset($_POST['Process']) && !check_trans())
 
 	$trans_type = $trans[0];
    	$trans_no = $trans[1];
+   	$pay_type = $_POST['PayType'];
 	new_doc_date($_POST['date_']);
 
 	$_SESSION['pay_items']->clear_items();
@@ -331,10 +337,10 @@ if (isset($_POST['Process']) && !check_trans())
 
 	if ($new)
 		meta_forward($_SERVER['PHP_SELF'], $trans_type==ST_BANKPAYMENT ?
-			"AddedID=$trans_no" : "AddedDep=$trans_no");
+			"AddedID=$trans_no&PayType=$pay_type" : "AddedDep=$trans_no");
 	else
 		meta_forward($_SERVER['PHP_SELF'], $trans_type==ST_BANKPAYMENT ?
-			"UpdatedID=$trans_no" : "UpdatedDep=$trans_no");
+			"UpdatedID=$trans_no&PayType=$pay_type" : "UpdatedDep=$trans_no");
 
 }
 

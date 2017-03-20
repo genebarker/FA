@@ -72,6 +72,9 @@ function print_bank_transactions()
 	$rep = new FrontReport(_('Bank Statement'), "BankStatement", user_pagesize(), 9, $orientation);
 	$dec = user_price_dec();
 
+	// display regular values in balance column as positive numbers
+    $sign = -1;
+
 	$cols = array(0, 75, 110, 145, 200, 330, 395, 460, 525);
 
 	$aligns = array('left',	'left', 'left', 'left', 'left', 'right', 'right', 'right');
@@ -136,7 +139,7 @@ function print_bank_transactions()
 					$rep->AmountCol(6, 7, abs($myrow['amount']), $dec);
 					$total_credit += abs($myrow['amount']);
 				}
-				$rep->AmountCol(7, 8, $total, $dec);
+				$rep->AmountCol(7, 8, $sign*$total, $dec);
 				$rep->NewLine();
 				if ($rep->row < $rep->bottomMargin + $rep->lineHeight)
 				{

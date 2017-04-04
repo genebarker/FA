@@ -44,6 +44,7 @@ function get_invoices($customer_id, $to, $all=true)
 			.TB_PREF."debtor_trans.ov_discount - ".TB_PREF."debtor_trans.alloc)";
 	$due = "IF (".TB_PREF."debtor_trans.type=".ST_SALESINVOICE.",".TB_PREF."debtor_trans.due_date,".TB_PREF."debtor_trans.tran_date)";
 	$sql = "SELECT ".TB_PREF."debtor_trans.type, ".TB_PREF."debtor_trans.reference,
+		".TB_PREF."debtor_trans.trans_no,
 		".TB_PREF."debtor_trans.tran_date,
 		$value as Balance,
 		IF ((TO_DAYS('$todate') - TO_DAYS($due)) > 0,$value,0) AS Due,
@@ -69,7 +70,7 @@ function get_invoices($customer_id, $to, $all=true)
 
 function print_aged_customer_analysis()
 {
-    global $path_to_root, $systypes_array;
+    global $path_to_root, $systypes_array, $print_invoice_no;
 
     	$to = $_POST['PARAM_0'];
     	$fromcust = $_POST['PARAM_1'];
@@ -196,7 +197,7 @@ function print_aged_customer_analysis()
 			{
 				$rep->NewLine(1, 2);
         		$rep->TextCol(0, 1, $systypes_array[$trans['type']], -2);
-				$rep->TextCol(1, 2,	$trans['reference'], -2);
+				$rep->TextCol(1, 2,	$print_invoice_no ? $trans['trans_no'] : $trans['reference'], -2);
 				$rep->DateCol(2, 3, $trans['tran_date'], true, -2);
 				if ($trans['type'] == ST_CUSTCREDIT || $trans['type'] == ST_CUSTPAYMENT || $trans['type'] == ST_BANKDEPOSIT)
 				{

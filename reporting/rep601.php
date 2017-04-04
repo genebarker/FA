@@ -54,7 +54,7 @@ function get_bank_transactions($from, $to, $account)
 
 function print_bank_transactions()
 {
-	global $path_to_root, $systypes_array;
+	global $path_to_root, $systypes_array, $print_invoice_no;
 
 	$acc = $_POST['PARAM_0'];
 	$from = $_POST['PARAM_1'];
@@ -125,7 +125,7 @@ function print_bank_transactions()
 				$total += $myrow['amount'];
 
 				$rep->TextCol(0, 1, $systypes_array[$myrow["type"]]);
-				$rep->TextCol(1, 2,	$myrow['trans_no']);
+				$rep->TextCol(1, 2,	$print_invoice_no ? $myrow['trans_no'] : $myrow['ref']);
 				$rep->TextCol(2, 3,	$myrow['cheque_no']);
 				$rep->DateCol(3, 4,	$myrow["trans_date"], true);
 				$rep->TextCol(4, 5,	payment_person_name($myrow["person_type_id"],$myrow["person_id"], false));

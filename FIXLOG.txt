@@ -1,6 +1,53 @@
+2017-04-05 10:07:11 +1300 Eugene F. Barker
+Improve reports to show preferred reference no's
+M	reporting/rep102.php
+M	reporting/rep108.php
+M	reporting/rep201.php
+M	reporting/rep202.php
+M	reporting/rep601.php
+M	reporting/rep704.php
+
+2017-04-04 10:18:51 +1300 Eugene F. Barker
+Improve cust balance report columns
+M	reporting/rep101.php
+
+2017-03-20 15:00:47 +1400 Eugene F. Barker
+Fix sign of balance column in bank statement rpt
+M	reporting/rep601.php
+
+2017-03-20 12:35:51 +1400 Eugene F. Barker
+Update bank statement to display cheque no's
+M	reporting/rep601.php
+
+2017-03-17 11:16:29 +1400 Eugene F. Barker
+Fix print bank payment option
+M	gl/gl_bank.php
+M	reporting/includes/reporting.inc
+
+2017-03-16 14:21:35 +1400 Eugene F. Barker
+Add print opt for bank pmt's & fix cheq validation
+M	gl/gl_bank.php
+
+2017-03-15 16:21:05 +1400 Eugene F. Barker
+Add support for cheque numbers
+M	gl/gl_bank.php
+M	gl/includes/db/gl_db_bank_accounts.inc
+M	gl/includes/db/gl_db_bank_trans.inc
+M	gl/includes/db/gl_db_banking.inc
+M	gl/includes/ui/gl_bank_ui.inc
+M	gl/inquiry/bank_inquiry.php
+
+2017-03-06 12:09:23 +1400 Eugene F. Barker
+Update FIXLOG to include latest changes
+M	FIXLOG.txt
+
 2017-03-06 11:31:46 +1400 Eugene F. Barker
 Improve GL tran report layout and fix query
-M       reporting/rep704.php
+M	reporting/rep704.php
+
+2017-02-28 16:51:20 +1400 Eugene F. Barker
+Correct FIXLOG.txt, add back truncated entry
+M	FIXLOG.txt
 
 2017-02-28 15:46:47 +1400 Eugene F. Barker
 Update FIXLOG to reflect latest changes

@@ -125,7 +125,7 @@ function get_gl_transactions_with_curr_filter($from_date, $to_date, $trans_no=0,
 
 function print_GL_transactions()
 {
-	global $path_to_root, $systypes_array;
+	global $path_to_root, $systypes_array, $print_invoice_no;
 
 	$dim = get_company_pref('use_dimension');
 	$dimension = $dimension2 = 0;
@@ -168,7 +168,7 @@ function print_GL_transactions()
 	$dec = user_price_dec();
 
   //$cols = array(0, 80, 100, 150, 210, 280, 340, 400, 450, 510, 570);
-	$cols = array(0, 65, 105, 125, 175, 230, 290, 345, 405, 465, 525);
+	$cols = array(0, 88, 98, 125, 175, 230, 290, 345, 405, 465, 525);
 	//------------0--1---2---3----4----5----6----7----8----9----10-------
 	//-----------------------dim1-dim2-----------------------------------
 	//-----------------------dim1----------------------------------------
@@ -176,13 +176,13 @@ function print_GL_transactions()
 	$aligns = array('left', 'left', 'left',	'left',	'left',	'left',	'left',	'right', 'right', 'right');
 
 	if ($dim == 2)
-		$headers = array(_('Type'),	_('Ref'), _('#'), _('Date'), _('Dimension')." 1", _('Dimension')." 2",
+		$headers = array(_('Type'),	_(''), _('#'), _('Date'), _('Dimension')." 1", _('Dimension')." 2",
 			_('Person/Item'), _('Debit'),	_('Credit'), _('Balance'));
 	elseif ($dim == 1)
-		$headers = array(_('Type'),	_('Ref'), _('#'), _('Date'), _('Dimension'), _('Person/Item'), "",
+		$headers = array(_('Type'),	_(''), _('#'), _('Date'), _('Dimension'), _('Person/Item'), "",
 			_('Debit'),	_('Credit'), _('Balance'));
 	else
-		$headers = array(_('Type'),	_('Ref'), _('#'), _('Date'), _('Person/Item'), "", "",
+		$headers = array(_('Type'),	_(''), _('#'), _('Date'), _('Person/Item'), "", "",
             _('Debit'),	_('Credit'), _('Balance'));
 
 	if ($dim == 2)
@@ -260,9 +260,8 @@ function print_GL_transactions()
 				$total += $row_amount;
 
 				$rep->TextCol(0, 1, $systypes_array[$myrow["type"]], -2);
-				$reference = get_reference($myrow["type"], $myrow["type_no"]);
-				$rep->TextCol(1, 2, $reference);
-				$rep->TextCol(2, 3,	$myrow['type_no'], -2);
+				$reference = $print_invoice_no ? $myrow['type_no'] : get_reference($myrow["type"], $myrow["type_no"]);
+				$rep->TextCol(2, 3,	$reference, -2);
 				$rep->DateCol(3, 4,	$myrow["tran_date"], true);
 				if ($dim >= 1)
 					$rep->TextCol(4, 5,	get_dimension_string($myrow['dimension_id']));

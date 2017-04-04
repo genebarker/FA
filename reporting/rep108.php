@@ -55,7 +55,7 @@ function getTransactions($debtorno, $date, $show_also_allocated)
 
 function print_statements()
 {
-	global $path_to_root, $systypes_array;
+	global $path_to_root, $systypes_array, $print_invoice_no;
 
 	include_once($path_to_root . "/reporting/includes/pdf_report.inc");
 
@@ -137,7 +137,7 @@ function print_statements()
 			$DisplayNet = number_format2($myrow2["TotalAmount"] - $myrow2["Allocated"],$dec);
 
 			$rep->TextCol(0, 1, $systypes_array[$myrow2['type']], -2);
-			$rep->TextCol(1, 2,	$myrow2['reference'], -2);
+			$rep->TextCol(1, 2,	$print_invoice_no ? $myrow2['trans_no'] : $myrow2['reference'], -2);
 			$rep->TextCol(2, 3,	sql2date($myrow2['tran_date']), -2);
 			if ($myrow2['type'] == ST_SALESINVOICE)
 				$rep->TextCol(3, 4,	sql2date($myrow2['due_date']), -2);

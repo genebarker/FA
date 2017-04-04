@@ -71,7 +71,7 @@ function getTransactions($supplier_id, $from, $to)
 
 function print_supplier_balances()
 {
-    	global $path_to_root, $systypes_array;
+    	global $path_to_root, $systypes_array, $print_invoice_no;
 
     	$from = $_POST['PARAM_0'];
     	$to = $_POST['PARAM_1'];
@@ -184,7 +184,7 @@ function print_supplier_balances()
 			if ($no_zeros && floatcmp(abs($trans['TotalAmount']), $trans['Allocated']) == 0) continue;
 			$rep->NewLine(1, 2);
 			$rep->TextCol(0, 1, $systypes_array[$trans['type']]);
-			$rep->TextCol(1, 2,	$trans['reference']);
+			$rep->TextCol(1, 2,	$print_invoice_no ? $trans['trans_no'] : $trans['reference']);
 			$rep->DateCol(2, 3,	$trans['tran_date'], true);
 			if ($trans['type'] == ST_SUPPINVOICE)
 				$rep->DateCol(3, 4,	$trans['due_date'], true);

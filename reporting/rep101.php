@@ -79,7 +79,7 @@ function get_transactions($debtorno, $from, $to)
 
 function print_customer_balances()
 {
-   	global $path_to_root, $systypes_array;
+   	global $path_to_root, $systypes_array, $print_invoice_no;
 
    	$from = $_POST['PARAM_0'];
    	$to = $_POST['PARAM_1'];
@@ -120,7 +120,7 @@ function print_customer_balances()
 	$cols = array(0, 100, 130, 190,	250, 320, 385, 450,	515);
 
 	$headers = array(_('Trans Type'), _('#'), _('Date'), _('Due Date'), _('Charges'), _('Credits'),
-		_('Allocated'), 	_('Balance'));
+					 _('Allocated'), _('Balance'));
 
 	$aligns = array('left',	'left',	'left',	'left',	'right', 'right', 'right', 'right');
 
@@ -194,7 +194,7 @@ function print_customer_balances()
 			if ($no_zeros && floatcmp($trans['TotalAmount'], $trans['Allocated']) == 0) continue;
 			$rep->NewLine(1, 2);
 			$rep->TextCol(0, 1, $systypes_array[$trans['type']]);
-			$rep->TextCol(1, 2,	$trans['trans_no']);
+			$rep->TextCol(1, 2,	$print_invoice_no ? $trans['trans_no'] : $trans['reference']);
 			$rep->DateCol(2, 3,	$trans['tran_date'], true);
 			if ($trans['type'] == ST_SALESINVOICE)
 				$rep->DateCol(3, 4,	$trans['due_date'], true);

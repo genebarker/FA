@@ -20,12 +20,14 @@ include_once($path_to_root . "/includes/data_checks.inc");
 include_once($path_to_root . "/gl/includes/gl_db.inc");
 include_once($path_to_root . "/includes/banking.inc");
 
+global $print_invoice_no;
+
 $js = "";
 if ($use_popup_windows)
 	$js .= get_js_open_window(800, 500);
 if ($use_date_picker)
 	$js .= get_js_date_picker();
-page(_($help_context = "Bank Statement"), isset($_GET['bank_account']), false, "", $js);
+page(_($help_context = "Bank Account Inquiry"), isset($_GET['bank_account']), false, "", $js);
 
 check_db_has_bank_accounts(_("There are no bank accounts defined in the system."));
 
@@ -67,18 +69,24 @@ display_heading($act['bank_account_name']." - ".$act['bank_curr_code']);
 
 start_table(TABLESTYLE);
 
-$th = array(_("Type"), _("#"), _("Ref"), _("Cheque"), _("Date"),
-	_("Debit"), _("Credit"), _("Balance"), _("Person/Item"), _("Memo"), "");
+if ($print_invoice_no) {
+    $th = array(_("Type"), _("#"), _("Cheque"), _("Date"),
+        _("Debit"), _("Credit"), _("Balance"), _("Person/Item"), _("Memo"), "");
+} else {
+    $th = array(_("Type"), _("#"), _("Ref"), _("Cheque"), _("Date"),
+        _("Debit"), _("Credit"), _("Balance"), _("Person/Item"), _("Memo"), "");
+}
 table_header($th);
 
 $bfw = get_balance_before_for_bank_account($_POST['bank_account'], $_POST['TransAfterDate']);
 
 $credit = $debit = 0;
 start_row("class='inquirybg' style='font-weight:bold'");
-label_cell(_("Opening Balance")." - ".$_POST['TransAfterDate'], "colspan=5");
+label_cell(_("Opening Balance")." - ".$_POST['TransAfterDate'],
+	$print_invoice_no ? "colspan=4" : "colspan=5");
 display_debit_or_credit_cells($bfw);
-label_cell("");
-label_cell("", "colspan=2");
+for ($i = 1; $i <= 4; $i++)
+	label_cell("");
 
 end_row();
 $running_total = $bfw;
@@ -98,7 +106,8 @@ while ($myrow = db_fetch($result))
 	$trandate = sql2date($myrow["trans_date"]);
 	label_cell($systypes_array[$myrow["type"]]);
 	label_cell(get_trans_view_str($myrow["type"],$myrow["trans_no"]));
-	label_cell(get_trans_view_str($myrow["type"],$myrow["trans_no"],$myrow['ref']));
+	if (!$print_invoice_no)
+		label_cell(get_trans_view_str($myrow["type"],$myrow["trans_no"],$myrow['ref']));
 	label_cell($myrow["cheque_no"]);
 	label_cell($trandate);
 	display_debit_or_credit_cells($myrow["amount"]);
@@ -122,13 +131,13 @@ while ($myrow = db_fetch($result))
 //end of while loop
 
 start_row("class='inquirybg' style='font-weight:bold'");
-label_cell(_("Ending Balance")." - ". $_POST['TransToDate'], "colspan=5");
+label_cell(_("Ending Balance")." - ". $_POST['TransToDate'], $print_invoice_no ? "colspan=4" : "colspan=5");
 amount_cell($debit);
 amount_cell(-$credit);
 //display_debit_or_credit_cells($running_total);
 amount_cell($debit+$credit);
-label_cell("");
-label_cell("", "colspan=2");
+for ($i = 1; $i <= 3; $i++)
+    label_cell("");
 end_row();
 end_table(2);
 div_end();

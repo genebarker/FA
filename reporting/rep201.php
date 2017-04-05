@@ -105,6 +105,9 @@ function print_supplier_balances()
 	if ($no_zeros) $nozeros = _('Yes');
 	else $nozeros = _('No');
 
+    // display regular values in balance column as positive numbers
+    $sign = -1;
+
 	$cols = array(0, 100, 130, 190,	250, 320, 385, 450,	515);
 
 	$headers = array(_('Trans Type'), _('#'), _('Date'), _('Due Date'), _('Charges'),
@@ -166,7 +169,7 @@ function print_supplier_balances()
 		$rep->AmountCol(4, 5, $init[0], $dec);
 		$rep->AmountCol(5, 6, $init[1], $dec);
 		$rep->AmountCol(6, 7, $init[2], $dec);
-		$rep->AmountCol(7, 8, $init[3], $dec);
+		$rep->AmountCol(7, 8, $sign*$init[3], $dec);
 		$total = array(0,0,0,0);
 		for ($i = 0; $i < 4; $i++)
 		{
@@ -208,9 +211,9 @@ function print_supplier_balances()
 			else	
 				$item[3] = ($item[1] - $item[2]) * -1;
 			if ($show_balance)	
-				$rep->AmountCol(7, 8, $accumulate, $dec);
+				$rep->AmountCol(7, 8, $sign*$accumulate, $dec);
 			else	
-				$rep->AmountCol(7, 8, $item[3], $dec);
+				$rep->AmountCol(7, 8, $sign*$item[3], $dec);
 			for ($i = 0; $i < 4; $i++)
 			{
 				$total[$i] += $item[$i];
@@ -224,7 +227,7 @@ function print_supplier_balances()
 		$rep->TextCol(0, 3,	_('Total'));
 		for ($i = 0; $i < 4; $i++)
 		{
-			$rep->AmountCol($i + 4, $i + 5, $total[$i], $dec);
+			$rep->AmountCol($i + 4, $i + 5, $i==3 ? $sign*$total[$i] : $total[$i], $dec);
 			$total[$i] = 0.0;
 		}
     	$rep->Line($rep->row  - 4);
@@ -236,7 +239,7 @@ function print_supplier_balances()
 	if ($show_balance)
 		$grandtotal[3] = $grandtotal[0] - $grandtotal[1];
 	for ($i = 0; $i < 4; $i++)
-		$rep->AmountCol($i + 4, $i + 5,$grandtotal[$i], $dec);
+		$rep->AmountCol($i + 4, $i + 5, $i==3 ? $sign*$grandtotal[$i] : $grandtotal[$i], $dec);
 	$rep->Line($rep->row  - 4);
 	$rep->NewLine();
     $rep->End();

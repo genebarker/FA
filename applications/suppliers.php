@@ -25,11 +25,9 @@ class suppliers_app extends application
 		$this->add_lapp_function(0, _("Direct &Invoice"),
 			"purchasing/po_entry_items.php?NewInvoice=Yes", 'SA_SUPPLIERINVOICE', MENU_TRANSACTION);
 
-// SIFA prefers to specifically allocate payments via Banking -> Payments function
-// commented out here to avoid accidental use
-//		$this->add_rapp_function(0, _("&Payments to Suppliers"),
-//			"purchasing/supplier_payment.php?", 'SA_SUPPLIERPAYMNT', MENU_TRANSACTION);
-//		$this->add_rapp_function(0, "","");
+		$this->add_rapp_function(0, _("&Payments to Suppliers"),
+			"purchasing/supplier_payment.php?", 'SA_SUPPLIERPAYMNT', MENU_TRANSACTION);
+		$this->add_rapp_function(0, "","");
 		$this->add_rapp_function(0, _("Supplier &Invoices"),
 			"purchasing/supplier_invoice.php?New=1", 'SA_SUPPLIERINVOICE', MENU_TRANSACTION);
 		$this->add_rapp_function(0, _("Supplier &Credit Notes"),

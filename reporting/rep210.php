@@ -1,13 +1,13 @@
 <?php
 /**********************************************************************
-    Copyright (C) FrontAccounting, LLC.
-	Released under the terms of the GNU General Public License, GPL, 
-	as published by the Free Software Foundation, either version 3 
+	Copyright (C) FrontAccounting, LLC.
+	Released under the terms of the GNU General Public License, GPL,
+	as published by the Free Software Foundation, either version 3
 	of the License, or (at your option) any later version.
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  
-    See the License here <http://www.gnu.org/licenses/gpl-3.0.html>.
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+	See the License here <http://www.gnu.org/licenses/gpl-3.0.html>.
 ***********************************************************************/
 
 $page_security = $_POST['PARAM_0'] == $_POST['PARAM_1'] ?
@@ -32,22 +32,22 @@ print_remittances();
 //----------------------------------------------------------------------------------------------------
 function get_remittance($type, $trans_no)
 {
-   	$sql = "SELECT ".TB_PREF."supp_trans.*, 
-   		(".TB_PREF."supp_trans.ov_amount+".TB_PREF."supp_trans.ov_gst) AS Total,
-   		".TB_PREF."supp_trans.ov_discount,
-   		".TB_PREF."suppliers.supp_name,  ".TB_PREF."suppliers.supp_account_no, 
-   		".TB_PREF."suppliers.curr_code, ".TB_PREF."suppliers.payment_terms, ".TB_PREF."suppliers.gst_no AS tax_id, 
-   		".TB_PREF."suppliers.address, ".TB_PREF."bank_trans.cheque_no
+	$sql = "SELECT ".TB_PREF."supp_trans.*, 
+		(".TB_PREF."supp_trans.ov_amount+".TB_PREF."supp_trans.ov_gst) AS Total,
+		".TB_PREF."supp_trans.ov_discount,
+		".TB_PREF."suppliers.supp_name,  ".TB_PREF."suppliers.supp_account_no, 
+		".TB_PREF."suppliers.curr_code, ".TB_PREF."suppliers.payment_terms, ".TB_PREF."suppliers.gst_no AS tax_id, 
+		".TB_PREF."suppliers.address, ".TB_PREF."bank_trans.cheque_no
 		FROM ".TB_PREF."supp_trans LEFT OUTER JOIN ".TB_PREF."bank_trans ON 
-		    ".TB_PREF."supp_trans.trans_no = ".TB_PREF."bank_trans.trans_no AND
-		     ".TB_PREF."supp_trans.type = ".TB_PREF."bank_trans.type, ".TB_PREF."suppliers
+			".TB_PREF."supp_trans.trans_no = ".TB_PREF."bank_trans.trans_no AND
+			".TB_PREF."supp_trans.type = ".TB_PREF."bank_trans.type, ".TB_PREF."suppliers
 		WHERE ".TB_PREF."supp_trans.supplier_id = ".TB_PREF."suppliers.supplier_id
 		AND ".TB_PREF."supp_trans.type = ".db_escape($type)."
 		AND ".TB_PREF."supp_trans.trans_no = ".db_escape($trans_no);
-   	$result = db_query($sql, "The remittance cannot be retrieved");
-   	if (db_num_rows($result) == 0)
-   		return false;
-    return db_fetch($result);
+	$result = db_query($sql, "The remittance cannot be retrieved");
+	if (db_num_rows($result) == 0)
+		return false;
+	return db_fetch($result);
 }
 
 function get_allocations_for_remittance($supplier_id, $type, $trans_no)
@@ -88,7 +88,7 @@ function print_remittances()
 	$cols = array(4, 85, 150, 225, 275, 360, 450, 515);
 
 	// $headers in doctext.inc
-	$aligns = array('left',	'left',	'left', 'left', 'right', 'right', 'right');
+	$aligns = array('left', 'left', 'left', 'left', 'right', 'right', 'right');
 
 	$params = array('comments' => $comments);
 
@@ -96,8 +96,8 @@ function print_remittances()
 
 	if ($email == 0)
 		$rep = new FrontReport(_('PAYMENT VOUCHER'), "PaymentVoucherBulk", user_pagesize(), 9, $orientation);
-    if ($orientation == 'L')
-    	recalculate_cols($cols);
+	if ($orientation == 'L')
+		recalculate_cols($cols);
 
 	for ($i = $from; $i <= $to; $i++)
 	{
@@ -138,7 +138,7 @@ function print_remittances()
 			$total_allocated = 0;
 //			$rep->TextCol(0, 4,	_("As advance / full / part / payment towards:"), -2);
 			$rep->NewLine(1);
-			
+
 			while ($myrow2=db_fetch($result))
 			{
 				$rep->TextCol(0, 1,	$systypes_array[$myrow2['type']], -2);
@@ -161,7 +161,7 @@ function print_remittances()
 				$rep->NewLine();
 				$rep->TextColLines(0, 6, $memo, -2);
 			}
-			$rep->row = $rep->bottomMargin + (20 * $rep->lineHeight);
+			$rep->row = $rep->bottomMargin + (25 * $rep->lineHeight);
 
 			// remove allocation totals
 //			$rep->TextCol(3, 6, _("Total Allocated"), -2);
@@ -184,9 +184,9 @@ function print_remittances()
 			$rep->AmountCol(6, 7, $myrow['Total'], $dec, -2);
 
 			if ($myrow['cheque_no'] != null) {
-			    $rep->NewLine(2);
-                $rep->TextCol(0, 6, "Cheque No: " . $myrow['cheque_no'], - 2);
-            }
+				$rep->NewLine(2);
+				$rep->TextCol(0, 6, "Cheque No: " . $myrow['cheque_no'], - 2);
+			}
 			$words = price_in_words($myrow['Total'], ST_SUPPAYMENT);
 			if ($words != "")
 			{
@@ -197,7 +197,11 @@ function print_remittances()
 			$rep->NewLine(3);
 			$rep->TextCol(0, 6, "Checked by: ________________________________________________   Date: _____________________", -2);
 			$rep->NewLine(3);
+			$rep->TextCol(0, 6, "Double-Checked by: __________________________________________   Date: _____________________", -2);
+			$rep->NewLine(3);
 			$rep->TextCol(0, 6, "Approved by: ________________________________________________   Date: _____________________", -2);
+			$rep->NewLine(3);
+			$rep->TextCol(0, 6, "Recieved by: _________________________________________________   Date: _____________________", -2);
 			$rep->Font();
 			if ($email == 1)
 			{

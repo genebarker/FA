@@ -84,7 +84,7 @@ function print_customer_balances()
    	$from = $_POST['PARAM_0'];
    	$to = $_POST['PARAM_1'];
    	$fromcust = $_POST['PARAM_2'];
-   	$show_balance = $_POST['PARAM_3'];
+   	$show_balance = $_POST['PARAM_3'] ? false : true;
    	$currency = $_POST['PARAM_4'];
    	$no_zeros = $_POST['PARAM_5'];
    	$comments = $_POST['PARAM_6'];

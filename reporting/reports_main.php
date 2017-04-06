@@ -1,13 +1,13 @@
 <?php
 /**********************************************************************
-    Copyright (C) FrontAccounting, LLC.
+	Copyright (C) FrontAccounting, LLC.
 	Released under the terms of the GNU General Public License, GPL,
 	as published by the Free Software Foundation, either version 3
 	of the License, or (at your option) any later version.
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-    See the License here <http://www.gnu.org/licenses/gpl-3.0.html>.
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+	See the License here <http://www.gnu.org/licenses/gpl-3.0.html>.
 ***********************************************************************/
 $path_to_root="..";
 $page_security = 'SA_OPEN';
@@ -351,7 +351,8 @@ if ($dim == 2)
 			_('To Account') => 'GL_ACCOUNTS',
 			_('Dimension')." 1" =>  'DIMENSIONS1',
 			_('Dimension')." 2" =>  'DIMENSIONS2',
-            _('Currency Filter') => 'CURRENCY',
+			_('Transaction Filter') => 'SYS_TYPES',
+			_('Currency Filter') => 'CURRENCY',
 			_('Comments') => 'TEXTBOX',
 			_('Orientation') => 'ORIENTATION',
 			_('Destination') => 'DESTINATION'));
@@ -405,7 +406,8 @@ else if ($dim == 1)
 			_('From Account') => 'GL_ACCOUNTS',
 			_('To Account') => 'GL_ACCOUNTS',
 			_('Dimension') =>  'DIMENSIONS1',
-            _('Currency Filter') => 'CURRENCY',
+			_('Transaction Filter') => 'SYS_TYPES',
+			_('Currency Filter') => 'CURRENCY',
 			_('Comments') => 'TEXTBOX',
 			_('Orientation') => 'ORIENTATION',
 			_('Destination') => 'DESTINATION'));
@@ -454,7 +456,8 @@ else
 			_('End Date') => 'DATEENDM',
 			_('From Account') => 'GL_ACCOUNTS',
 			_('To Account') => 'GL_ACCOUNTS',
-            _('Currency Filter') => 'CURRENCY',
+			_('Transaction Filter') => 'SYS_TYPES',
+			_('Currency Filter') => 'CURRENCY',
 			_('Comments') => 'TEXTBOX',
 			_('Orientation') => 'ORIENTATION',
 			_('Destination') => 'DESTINATION'));

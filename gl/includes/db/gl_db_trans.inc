@@ -1,13 +1,13 @@
 <?php
 /**********************************************************************
-    Copyright (C) FrontAccounting, LLC.
+	Copyright (C) FrontAccounting, LLC.
 	Released under the terms of the GNU General Public License, GPL, 
 	as published by the Free Software Foundation, either version 3 
 	of the License, or (at your option) any later version.
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  
-    See the License here <http://www.gnu.org/licenses/gpl-3.0.html>.
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+	See the License here <http://www.gnu.org/licenses/gpl-3.0.html>.
 ***********************************************************************/
 //--------------------------------------------------------------------------------
 
@@ -127,10 +127,10 @@ function get_gl_transactions($from_date, $to_date, $trans_no=0,
 		$sql .= " AND ".TB_PREF."gl_trans.account = ".db_escape($account);
 
 	if ($dimension != 0)
-  		$sql .= " AND ".TB_PREF."gl_trans.dimension_id = ".($dimension<0?0:db_escape($dimension));
+		$sql .= " AND ".TB_PREF."gl_trans.dimension_id = ".($dimension<0?0:db_escape($dimension));
 
 	if ($dimension2 != 0)
-  		$sql .= " AND ".TB_PREF."gl_trans.dimension2_id = ".($dimension2<0?0:db_escape($dimension2));
+		$sql .= " AND ".TB_PREF."gl_trans.dimension2_id = ".($dimension2<0?0:db_escape($dimension2));
 
 	if ($filter_type != null AND is_numeric($filter_type))
 		$sql .= " AND ".TB_PREF."gl_trans.type= ".db_escape($filter_type);
@@ -197,16 +197,16 @@ function get_gl_balance_from_to($from_date, $to_date, $account, $dimension=0, $d
 	$from = date2sql($from_date);
 	$to = date2sql($to_date);
 
-    $sql = "SELECT SUM(amount) FROM ".TB_PREF."gl_trans
+	$sql = "SELECT SUM(amount) FROM ".TB_PREF."gl_trans
 		WHERE account='$account'";
 	if ($from_date != "")
 		$sql .= "  AND tran_date > '$from'";
 	if ($to_date != "")
 		$sql .= "  AND tran_date < '$to'";
 	if ($dimension != 0)
-  		$sql .= " AND dimension_id = ".($dimension<0?0:db_escape($dimension));
+		$sql .= " AND dimension_id = ".($dimension<0?0:db_escape($dimension));
 	if ($dimension2 != 0)
-  		$sql .= " AND dimension2_id = ".($dimension2<0?0:db_escape($dimension2));
+		$sql .= " AND dimension2_id = ".($dimension2<0?0:db_escape($dimension2));
 
 	$result = db_query($sql, "The starting balance for account $account could not be calculated");
 
@@ -221,16 +221,16 @@ function get_gl_trans_from_to($from_date, $to_date, $account, $dimension=0, $dim
 	$from = date2sql($from_date);
 	$to = date2sql($to_date);
 
-    $sql = "SELECT SUM(amount) FROM ".TB_PREF."gl_trans
+	$sql = "SELECT SUM(amount) FROM ".TB_PREF."gl_trans
 		WHERE account='$account'";
 	if ($from_date != "")
 		$sql .= " AND tran_date >= '$from'";
 	if ($to_date != "")
 		$sql .= " AND tran_date <= '$to'";
 	if ($dimension != 0)
-  		$sql .= " AND dimension_id = ".($dimension<0?0:db_escape($dimension));
+		$sql .= " AND dimension_id = ".($dimension<0?0:db_escape($dimension));
 	if ($dimension2 != 0)
-  		$sql .= " AND dimension2_id = ".($dimension2<0?0:db_escape($dimension2));
+		$sql .= " AND dimension2_id = ".($dimension2<0?0:db_escape($dimension2));
 
 	$result = db_query($sql, "Transactions for account $account could not be calculated");
 
@@ -252,9 +252,9 @@ function get_balance($account, $dimension, $dimension2, $from, $to, $from_incl=t
 	if ($account != null)
 		$sql .= " account=".db_escape($account)." AND";
 	if ($dimension != 0)
-  		$sql .= " dimension_id = ".($dimension<0?0:db_escape($dimension))." AND";
+		$sql .= " dimension_id = ".($dimension<0?0:db_escape($dimension))." AND";
 	if ($dimension2 != 0)
-  		$sql .= " dimension2_id = ".($dimension2<0?0:db_escape($dimension2))." AND";
+		$sql .= " dimension2_id = ".($dimension2<0?0:db_escape($dimension2))." AND";
 	$from_date = date2sql($from);
 	if ($from_incl)
 		$sql .= " tran_date >= '$from_date'  AND";
@@ -286,9 +286,9 @@ function get_budget_trans_from_to($from_date, $to_date, $account, $dimension=0, 
 	if ($to_date != "")
 		$sql .= " AND tran_date <= '$to' ";
 	if ($dimension != 0)
-  		$sql .= " AND dimension_id = ".($dimension<0?0:db_escape($dimension));
+		$sql .= " AND dimension_id = ".($dimension<0?0:db_escape($dimension));
 	if ($dimension2 != 0)
-  		$sql .= " AND dimension2_id = ".($dimension2<0?0:db_escape($dimension2));
+		$sql .= " AND dimension2_id = ".($dimension2<0?0:db_escape($dimension2));
 	$result = db_query($sql,"No budget accounts were returned");
 
 	$row = db_fetch_row($result);
@@ -303,7 +303,7 @@ function exists_gl_budget($date_, $account, $dimension, $dimension2)
 		dimension_id=".db_escape($dimension)." AND dimension2_id=".db_escape($dimension2);
 	$result = db_query($sql, "Cannot retreive a gl transaction");
 
-    return (db_num_rows($result) > 0);
+	return (db_num_rows($result) > 0);
 }
 
 function add_update_gl_budget_trans($date_, $account, $dimension, $dimension2, $amount)
@@ -479,7 +479,7 @@ function get_tax_summary($from, $to)
 			AND taxrec.tran_date <= '$todate'
 		GROUP BY ttype.id";
 //display_error($sql);
-    return db_query($sql,"Cannot retrieve tax summary");
+	return db_query($sql,"Cannot retrieve tax summary");
 }
 
 //--------------------------------------------------------------------------------
@@ -496,9 +496,9 @@ function write_journal_entries(&$cart, $reverse, $use_transaction=true)
 	$new = $cart->order_id == 0;
 	
 	if ($new)
-	    $cart->order_id = get_next_trans_no($trans_type);
+		$cart->order_id = get_next_trans_no($trans_type);
 
-    $trans_id = $cart->order_id;
+	$trans_id = $cart->order_id;
 
 	if ($use_transaction)
 		begin_transaction();
@@ -514,12 +514,12 @@ function write_journal_entries(&$cart, $reverse, $use_transaction=true)
 		add_gl_trans($trans_type, $trans_id, $date_, $journal_item->code_id,
 			$journal_item->dimension_id, $journal_item->dimension2_id,
 			$journal_item->reference, $journal_item->amount);
-    	if ($is_bank_to)
-    	{
-    		add_bank_trans($trans_type, $trans_id, $is_bank_to, $ref,
-    			$date_, $journal_item->amount,	0, "", get_company_currency(),
-    			"Cannot insert a destination bank transaction");
-    	}
+		if ($is_bank_to)
+		{
+			add_bank_trans($trans_type, $trans_id, $is_bank_to, $ref,
+				$date_, $journal_item->amount,	0, "", get_company_currency(),
+				"Cannot insert a destination bank transaction");
+		}
 		// store tax details if the gl account is a tax account
 		add_gl_tax_details($journal_item->code_id, 
 			ST_JOURNAL, $trans_id, $journal_item->amount, 1, $date_, $memo_);
@@ -536,34 +536,34 @@ function write_journal_entries(&$cart, $reverse, $use_transaction=true)
 
 	if ($reverse)
 	{
-    	//$reversingDate = date(user_date_display(),
-    	//	Mktime(0,0,0,get_month($date_)+1,1,get_year($date_)));
-    	$reversingDate = begin_month(add_months($date_, 1));
+		//$reversingDate = date(user_date_display(),
+		//	Mktime(0,0,0,get_month($date_)+1,1,get_year($date_)));
+		$reversingDate = begin_month(add_months($date_, 1));
 
-    	$trans_id_reverse = get_next_trans_no($trans_type);
+		$trans_id_reverse = get_next_trans_no($trans_type);
 
-    	foreach ($cart->gl_items as $journal_item)
-    	{
+		foreach ($cart->gl_items as $journal_item)
+		{
 			$is_bank_to = is_bank_account($journal_item->code_id);
 
-    		add_gl_trans($trans_type, $trans_id_reverse, $reversingDate,
-    			$journal_item->code_id, $journal_item->dimension_id, $journal_item->dimension2_id,
-    			$journal_item->reference, -$journal_item->amount);
-    		if ($is_bank_to)
-    		{
-    			add_bank_trans($trans_type, $trans_id_reverse, $is_bank_to, $ref,
-    				$reversingDate, -$journal_item->amount,
-    				0, "", get_company_currency(),
-    				"Cannot insert a destination bank transaction");
-    		}
+			add_gl_trans($trans_type, $trans_id_reverse, $reversingDate,
+				$journal_item->code_id, $journal_item->dimension_id, $journal_item->dimension2_id,
+				$journal_item->reference, -$journal_item->amount);
+			if ($is_bank_to)
+			{
+				add_bank_trans($trans_type, $trans_id_reverse, $is_bank_to, $ref,
+					$reversingDate, -$journal_item->amount,
+					0, "", get_company_currency(),
+					"Cannot insert a destination bank transaction");
+			}
 			// store tax details if the gl account is a tax account
 			add_gl_tax_details($journal_item->code_id, 
 				ST_JOURNAL, $trans_id, $journal_item->amount, 1, $reversingDate, $memo_);
-    	}
+		}
 
-    	add_comments($trans_type, $trans_id_reverse, $reversingDate, $memo_);
+		add_comments($trans_type, $trans_id_reverse, $reversingDate, $memo_);
 
-    	$Refs->save($trans_type, $trans_id_reverse, $ref);
+		$Refs->save($trans_type, $trans_id_reverse, $ref);
 		add_audit_trail($trans_type, $trans_id_reverse, $reversingDate);
 	}
 
@@ -581,7 +581,7 @@ function exists_gl_trans($type, $trans_id)
 		." AND type_no=".db_escape($trans_id);
 	$result = db_query($sql, "Cannot retreive a gl transaction");
 
-    return (db_num_rows($result) > 0);
+	return (db_num_rows($result) > 0);
 }
 
 //--------------------------------------------------------------------------------------------------

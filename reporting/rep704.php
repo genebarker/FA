@@ -73,10 +73,10 @@ function get_gl_balance_from_to_with_curr_filter($from_date, $to_date, $account,
 }
 
 function get_gl_transactions_with_curr_filter($from_date, $to_date, $trans_no=0,
-		$account=null, $dimension=0, $dimension2=0, $currency='')
+		$account=null, $dimension=0, $dimension2=0, $filter_type=null, $currency='')
 {
 	if ($currency == '') // use original
-		return get_gl_transactions($from_date, $to_date, -1, $account, $dimension, $dimension2);
+		return get_gl_transactions($from_date, $to_date, -1, $account, $dimension, $dimension2, $filter_type);
 
 	// use enhanced version with currency filter
 	global $show_voided_gl_trans;
@@ -118,6 +118,9 @@ function get_gl_transactions_with_curr_filter($from_date, $to_date, $trans_no=0,
 	if ($dimension2 != 0)
 		$sql .= " AND glt.dimension2_id = ".($dimension2<0?0:db_escape($dimension2));
 
+	if ($filter_type != null AND is_numeric($filter_type))
+		$sql .= " AND glt.type = ".db_escape($filter_type);
+
 	$sql .= " ORDER BY glt.tran_date, glt.counter";
 
 	return db_query($sql, "The transactions for could not be retrieved");
@@ -138,25 +141,28 @@ function print_GL_transactions()
 	{
 		$dimension = $_POST['PARAM_4'];
 		$dimension2 = $_POST['PARAM_5'];
+		$transaction_type = $_POST['PARAM_6'];
+		$currency = $_POST['PARAM_7'];
+		$comments = $_POST['PARAM_8'];
+		$orientation = $_POST['PARAM_9'];
+		$destination = $_POST['PARAM_10'];
+	}
+	else if ($dim == 1)
+	{
+		$dimension = $_POST['PARAM_4'];
+		$transaction_type = $_POST['PARAM_5'];
 		$currency = $_POST['PARAM_6'];
 		$comments = $_POST['PARAM_7'];
 		$orientation = $_POST['PARAM_8'];
 		$destination = $_POST['PARAM_9'];
 	}
-	else if ($dim == 1)
+	else
 	{
-		$dimension = $_POST['PARAM_4'];
+		$transaction_type = $_POST['PARAM_4'];
 		$currency = $_POST['PARAM_5'];
 		$comments = $_POST['PARAM_6'];
 		$orientation = $_POST['PARAM_7'];
 		$destination = $_POST['PARAM_8'];
-	}
-	else
-	{
-		$currency = $_POST['PARAM_4'];
-		$comments = $_POST['PARAM_5'];
-		$orientation = $_POST['PARAM_6'];
-		$destination = $_POST['PARAM_7'];
 	}
 	if ($destination)
 		include_once($path_to_root . "/reporting/includes/excel_report.inc");
@@ -194,7 +200,10 @@ function print_GL_transactions()
 							'to' => ''),
 						4 => array('text' => _('Dimension')." 2", 'from' => get_dimension_string($dimension2),
 							'to' => ''),
-						5 => array('text' => _('Currency Filter'), 'from' => $currency, 'to' => ''));
+						5 => array('text' => _('Transaction Filter'),
+							'from' => $transaction_type == -1 ? '' : $systypes_array[$transaction_type],
+							'to' => ''),
+						6 => array('text' => _('Currency Filter'), 'from' => $currency, 'to' => ''));
 	}
 	else if ($dim == 1)
 	{
@@ -203,14 +212,20 @@ function print_GL_transactions()
 						2 => array('text' => _('Accounts'),'from' => $fromacc,'to' => $toacc),
 						3 => array('text' => _('Dimension'), 'from' => get_dimension_string($dimension),
 							'to' => ''),
-						4 => array('text' => _('Currency Filter'), 'from' => $currency, 'to' => ''));
+						4 => array('text' => _('Transaction Filter'),
+							'from' => $transaction_type == -1 ? '' : $systypes_array[$transaction_type],
+							'to' => ''),
+						5 => array('text' => _('Currency Filter'), 'from' => $currency, 'to' => ''));
 	}
 	else
 	{
 		$params =   array( 	0 => $comments,
 						1 => array('text' => _('Period'), 'from' => $from, 'to' => $to),
 						2 => array('text' => _('Accounts'),'from' => $fromacc,'to' => $toacc),
-						3 => array('text' => _('Currency Filter'), 'from' => $currency, 'to' => ''));
+						3 => array('text' => _('Transaction Filter'),
+							'from' => $transaction_type == -1 ? '' : $systypes_array[$transaction_type],
+							'to' => ''),
+						4 => array('text' => _('Currency Filter'), 'from' => $currency, 'to' => ''));
 	}
 	if ($orientation == 'L')
 		recalculate_cols($cols);
@@ -232,19 +247,22 @@ function print_GL_transactions()
 				$begin = $from;
 			$begin = add_days($begin, -1);
 		}
-		$prev_balance = get_gl_balance_from_to_with_curr_filter($begin, $from, $account["account_code"], $dimension, $dimension2, $currency);
+		$prev_balance = $transaction_type == -1 ? get_gl_balance_from_to_with_curr_filter($begin, $from, $account["account_code"], $dimension, $dimension2, $currency) : 0.0;
 
-		$trans = get_gl_transactions_with_curr_filter($from, $to, -1, $account['account_code'], $dimension, $dimension2, $currency);
+		$trans = get_gl_transactions_with_curr_filter($from, $to, -1, $account['account_code'],
+				$dimension, $dimension2, $transaction_type == -1 ? null : $transaction_type, $currency);
 		$rows = db_num_rows($trans);
 		if ($prev_balance == 0.0 && $rows == 0)
 			continue;
 		$rep->Font('bold');
 		$rep->TextCol(0, 4,	$account['account_code'] . " " . $account['account_name'], -2);
-		$rep->TextCol(4, 6, _('Opening Balance'));
-		if ($prev_balance > 0.0)
-			$rep->AmountCol(7, 8, abs($prev_balance), $dec);
-		else
-			$rep->AmountCol(8, 9, abs($prev_balance), $dec);
+		if ($transaction_type == -1) {
+			$rep->TextCol(4, 6, _('Opening Balance'));
+			if ($prev_balance > 0.0)
+				$rep->AmountCol(7, 8, abs($prev_balance), $dec);
+			else
+				$rep->AmountCol(8, 9, abs($prev_balance), $dec);
+		}
 		$rep->Font();
 		$total = $prev_balance;
 		$rep->NewLine(2);
@@ -292,7 +310,7 @@ function print_GL_transactions()
 			$rep->NewLine();
 		}
 		$rep->Font('bold');
-		$rep->TextCol(4, 6,	_("Ending Balance"));
+		$rep->TextCol(4, 6,	$transaction_type == -1 ? _("Ending Balance") : _("Summary"));
 		if ($total > 0.0)
 			$rep->AmountCol(7, 8, abs($total), $dec);
 		else

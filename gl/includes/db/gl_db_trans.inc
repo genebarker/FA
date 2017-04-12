@@ -104,7 +104,7 @@ function get_gl_transactions($from_date, $to_date, $trans_no=0,
 	$amount_min=null, $amount_max=null)
 {
 	global $show_voided_gl_trans;
-	
+
 	$from = date2sql($from_date);
 	$to = date2sql($to_date);
 
@@ -119,7 +119,7 @@ function get_gl_transactions($from_date, $to_date, $trans_no=0,
 		AND tran_date >= '$from'
 		AND tran_date <= '$to'";
 	if (isset($show_voided_gl_trans) && $show_voided_gl_trans == 0)
-		$sql .= " AND ".TB_PREF."gl_trans.amount <> 0"; 
+		$sql .= " AND ".TB_PREF."gl_trans.amount <> 0";
 	if ($trans_no > 0)
 		$sql .= " AND ".TB_PREF."gl_trans.type_no LIKE ".db_escape('%'.$trans_no);
 
@@ -134,12 +134,61 @@ function get_gl_transactions($from_date, $to_date, $trans_no=0,
 
 	if ($filter_type != null AND is_numeric($filter_type))
 		$sql .= " AND ".TB_PREF."gl_trans.type= ".db_escape($filter_type);
-		
+
 	if ($amount_min != null)
 		$sql .= " AND ABS(".TB_PREF."gl_trans.amount) >= ABS(".db_escape($amount_min).")";
-	
+
 	if ($amount_max != null)
 		$sql .= " AND ABS(".TB_PREF."gl_trans.amount) <= ABS(".db_escape($amount_max).")";
+
+	$sql .= " ORDER BY tran_date, counter";
+
+	return db_query($sql, "The transactions for could not be retrieved");
+}
+
+function get_gl_transactions_with_bank_detail($from_date, $to_date, $trans_no=0,
+							 $account=null, $dimension=0, $dimension2=0, $filter_type=null,
+							 $amount_min=null, $amount_max=null)
+{
+	global $show_voided_gl_trans;
+
+	$from = date2sql($from_date);
+	$to = date2sql($to_date);
+
+	$sql = "
+		SELECT gt.*, bt.bank_act, bt.cheque_no, bt.tt_ind,
+			ba.account_type as bank_account_type, cm.account_name 
+		FROM ".TB_PREF."gl_trans gt
+			LEFT JOIN ".TB_PREF."voided v ON gt.type_no=v.id AND v.type=gt.type
+			LEFT OUTER JOIN ".TB_PREF."bank_trans bt ON gt.type = bt.type AND gt.type_no = bt.trans_no
+			LEFT OUTER JOIN ".TB_PREF."bank_accounts ba ON bt.bank_act = ba.id,
+			".TB_PREF."chart_master cm
+		WHERE cm.account_code=gt.account
+			AND ISNULL(v.date_)
+			AND gt.tran_date >= '$from'
+			AND gt.tran_date <= '$to'";
+	if (isset($show_voided_gl_trans) && $show_voided_gl_trans == 0)
+		$sql .= " AND gt.amount <> 0";
+	if ($trans_no > 0)
+		$sql .= " AND gt.type_no LIKE ".db_escape('%'.$trans_no);
+
+	if ($account != null)
+		$sql .= " AND gt.account = ".db_escape($account);
+
+	if ($dimension != 0)
+		$sql .= " AND gt.dimension_id = ".($dimension<0?0:db_escape($dimension));
+
+	if ($dimension2 != 0)
+		$sql .= " AND gt.dimension2_id = ".($dimension2<0?0:db_escape($dimension2));
+
+	if ($filter_type != null AND is_numeric($filter_type))
+		$sql .= " AND gt.type= ".db_escape($filter_type);
+
+	if ($amount_min != null)
+		$sql .= " AND ABS(gt.amount) >= ABS(".db_escape($amount_min).")";
+
+	if ($amount_max != null)
+		$sql .= " AND ABS(gt.amount) <= ABS(".db_escape($amount_max).")";
 
 	$sql .= " ORDER BY tran_date, counter";
 

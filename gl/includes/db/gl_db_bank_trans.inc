@@ -16,7 +16,8 @@
 // $date_ is display date (non-sql)
 
 function add_bank_trans($type, $trans_no, $bank_act, $ref, $date_,
-	$amount, $person_type_id, $person_id, $currency="", $err_msg="", $rate=0, $cheque_no="")
+	$amount, $person_type_id, $person_id, $currency="", $err_msg="", $rate=0,
+	$cheque_no="", $tt_ind="")
 {
 	$sqlDate = date2sql($date_);
 
@@ -38,13 +39,14 @@ function add_bank_trans($type, $trans_no, $bank_act, $ref, $date_,
 	//$BankToHomeCurrencyRate = get_exchange_rate_to_home_currency($bank_account_currency, $date_);
 
 	$formatted_cheque_no = $cheque_no == "" ? "NULL" : db_escape($cheque_no);
+	$formatted_tt_ind = $tt_ind == "" ? "NULL" : db_escape($tt_ind);
 
 	$sql = "INSERT INTO ".TB_PREF."bank_trans (type, trans_no, bank_act, ref,
-		trans_date, amount, person_type_id, person_id, cheque_no) ";
+		trans_date, amount, person_type_id, person_id, cheque_no, tt_ind) ";
 
 	$sql .= "VALUES ($type, $trans_no, '$bank_act', ".db_escape($ref).", '$sqlDate',
 		".db_escape($amount_bank).", ".db_escape($person_type_id)
-		.", ". db_escape($person_id).", $formatted_cheque_no)";
+		.", ". db_escape($person_id).", $formatted_cheque_no, $formatted_tt_ind)";
 
 	if ($err_msg == "")
 		$err_msg = "The bank transaction could not be inserted";

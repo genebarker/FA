@@ -107,11 +107,11 @@ function show_results()
     	$_POST['Dimension'] = 0;
     if (!isset($_POST['Dimension2']))
     	$_POST['Dimension2'] = 0;
-	$result = get_gl_transactions($_POST['TransFromDate'], $_POST['TransToDate'], -1,
+	$result = get_gl_transactions_with_bank_detail($_POST['TransFromDate'], $_POST['TransToDate'], -1,
     	$_POST["account"], $_POST['Dimension'], $_POST['Dimension2'], null,
     	input_num('amount_min'), input_num('amount_max'));
 
-	$colspan = ($dim == 2 ? "6" : ($dim == 1 ? "5" : "4"));
+	$colspan = ($dim == 2 ? "7" : ($dim == 1 ? "6" : "5"));
 
 	if ($_POST["account"] != null)
 		display_heading($_POST["account"]. "&nbsp;&nbsp;&nbsp;".$act_name);
@@ -120,10 +120,10 @@ function show_results()
 	$show_balances = $_POST["account"] != null && 
                      input_num("amount_min") == 0 && 
                      input_num("amount_max") == 0;
-		
+
 	start_table(TABLESTYLE);
 	
-	$first_cols = array(_("Type"), _("#"), _("Date"));
+	$first_cols = array(_("Type"), _("Detail"), _("#"), _("Date"));
 	
 	if ($_POST["account"] == null)
 	    $account_col = array(_("Account"));
@@ -180,6 +180,7 @@ function show_results()
     	$trandate = sql2date($myrow["tran_date"]);
 
     	label_cell($systypes_array[$myrow["type"]]);
+		label_cell(get_bank_trans_type_detail_view_str($myrow["type"], $myrow['bank_account_type'], $myrow["cheque_no"], $myrow["tt_ind"]));
 		label_cell(get_gl_view_str($myrow["type"], $myrow["type_no"], $myrow["type_no"], true));
     	label_cell($trandate);
     	

@@ -73,6 +73,14 @@ function get_parent_type($type)
 }
 
 //----------------------------------------------------------------------------------
+//		Bank account types
+//
+define('BAT_SAVINGS', 0);
+define('BAT_CHEQUING', 1);
+define('BAT_CREDIT', 2);
+define('BAT_CASH', 3);
+
+//----------------------------------------------------------------------------------
 //		Bank transaction types
 //
 define('BT_TRANSFER', 0);

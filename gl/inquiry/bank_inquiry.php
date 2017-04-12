@@ -70,10 +70,10 @@ display_heading($act['bank_account_name']." - ".$act['bank_curr_code']);
 start_table(TABLESTYLE);
 
 if ($print_invoice_no) {
-    $th = array(_("Type"), _("#"), _("Cheque"), _("Date"),
+    $th = array(_("Type"), _("Detail"), _("#"), _("Date"),
         _("Debit"), _("Credit"), _("Balance"), _("Person/Item"), _("Memo"), "");
 } else {
-    $th = array(_("Type"), _("#"), _("Ref"), _("Cheque"), _("Date"),
+    $th = array(_("Type"), _("Detail"), _("#"), _("Ref"), _("Date"),
         _("Debit"), _("Credit"), _("Balance"), _("Person/Item"), _("Memo"), "");
 }
 table_header($th);
@@ -105,10 +105,10 @@ while ($myrow = db_fetch($result))
 
 	$trandate = sql2date($myrow["trans_date"]);
 	label_cell($systypes_array[$myrow["type"]]);
+	label_cell(get_bank_trans_type_detail_view_str($myrow["type"], $act['account_type'], $myrow["cheque_no"], $myrow["tt_ind"]));
 	label_cell(get_trans_view_str($myrow["type"],$myrow["trans_no"]));
 	if (!$print_invoice_no)
 		label_cell(get_trans_view_str($myrow["type"],$myrow["trans_no"],$myrow['ref']));
-	label_cell($myrow["cheque_no"]);
 	label_cell($trandate);
 	display_debit_or_credit_cells($myrow["amount"]);
 	amount_cell($running_total);

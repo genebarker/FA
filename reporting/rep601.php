@@ -75,12 +75,12 @@ function print_bank_transactions()
 	// display regular values in balance column as positive numbers
     $sign = -1;
 
-	$cols = array(0, 75, 110, 145, 200, 330, 395, 460, 525);
+	$cols = array(0, 75, 135, 165, 215, 330, 395, 460, 525);
 
-	$aligns = array('left',	'left', 'left', 'left', 'left', 'right', 'right', 'right');
+	$aligns = array('left', 'left', 'left', 'left', 'left', 'right', 'right', 'right');
 
-	$headers = array(_('Type'),	_('#'),	_('Cheque'), _('Date'), _('Person/Item'),
-		_('Debit'),	_('Credit'), _('Balance'));
+	$headers = array(_('Type'), _('Detail'), _('#'), _('Date'), _('Person/Item'),
+		_('Debit'), _('Credit'), _('Balance'));
 
 	$account = get_bank_account($acc);
 	$act = $account['bank_account_name']." - ".$account['bank_curr_code']." - ".$account['bank_account_number'];
@@ -103,7 +103,7 @@ function print_bank_transactions()
 	if ($prev_balance != 0.0 || $rows != 0)
 	{
 		$rep->Font('bold');
-		$rep->TextCol(0, 4,	$act);
+		$rep->TextCol(0, 4, $act);
 		$rep->TextCol(4, 5, _('Opening Balance'));
 		if ($prev_balance > 0.0)
 			$rep->AmountCol(5, 6, abs($prev_balance), $dec);
@@ -125,10 +125,10 @@ function print_bank_transactions()
 				$total += $myrow['amount'];
 
 				$rep->TextCol(0, 1, $systypes_array[$myrow["type"]]);
-				$rep->TextCol(1, 2,	$print_invoice_no ? $myrow['trans_no'] : $myrow['ref']);
-				$rep->TextCol(2, 3,	$myrow['cheque_no']);
-				$rep->DateCol(3, 4,	$myrow["trans_date"], true);
-				$rep->TextCol(4, 5,	payment_person_name($myrow["person_type_id"],$myrow["person_id"], false));
+				$rep->TextCol(1, 2, get_bank_trans_type_detail_view_str($myrow["type"], $account['account_type'], $myrow["cheque_no"], $myrow["tt_ind"]));
+				$rep->TextCol(2, 3, $print_invoice_no ? $myrow['trans_no'] : $myrow['ref']);
+				$rep->DateCol(3, 4, $myrow["trans_date"], true);
+				$rep->TextCol(4, 5, payment_person_name($myrow["person_type_id"],$myrow["person_id"], false));
 				if ($myrow['amount'] > 0.0)
 				{
 					$rep->AmountCol(5, 6, abs($myrow['amount']), $dec);

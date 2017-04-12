@@ -76,7 +76,7 @@ function get_gl_transactions_with_curr_filter($from_date, $to_date, $trans_no=0,
 		$account=null, $dimension=0, $dimension2=0, $filter_type=null, $currency='')
 {
 	if ($currency == '') // use original
-		return get_gl_transactions($from_date, $to_date, -1, $account, $dimension, $dimension2, $filter_type);
+		return get_gl_transactions_with_bank_detail($from_date, $to_date, -1, $account, $dimension, $dimension2, $filter_type);
 
 	// use enhanced version with currency filter
 	global $show_voided_gl_trans;
@@ -84,8 +84,10 @@ function get_gl_transactions_with_curr_filter($from_date, $to_date, $trans_no=0,
 	$from = date2sql($from_date);
 	$to = date2sql($to_date);
 
-	$sql = "SELECT glt.*, cm.account_name, COALESCE(ba.bank_curr_code, dtm.curr_code, sp.value) AS curr_code,
-			CASE WHEN glt.amount=0 THEN 0 ELSE COALESCE(bt.amount, glt.amount/dt.rate, glt.amount) END AS curr_amount
+	$sql = "
+		SELECT glt.*, cm.account_name, COALESCE(ba.bank_curr_code, dtm.curr_code, sp.value) AS curr_code,
+			CASE WHEN glt.amount=0 THEN 0 ELSE COALESCE(bt.amount, glt.amount/dt.rate, glt.amount) END AS curr_amount,
+			bt.bank_act, bt.cheque_no, bt.tt_ind, ba.account_type as bank_account_type
 		FROM ".TB_PREF."gl_trans glt
 			LEFT JOIN ".TB_PREF."voided v ON glt.type_no=v.id AND glt.type=v.type
 			LEFT OUTER JOIN ".TB_PREF."bank_accounts ba ON glt.account=ba.account_code
@@ -173,22 +175,22 @@ function print_GL_transactions()
 	$rep = new FrontReport(_('GL Account Transactions'), "GLAccountTransactions", user_pagesize(), 9, $orientation);
 	$dec = user_price_dec();
 
-  //$cols = array(0, 80, 100, 150, 210, 280, 340, 400, 450, 510, 570);
 	$cols = array(0, 88, 98, 125, 175, 230, 290, 345, 405, 465, 525);
-	//------------0--1---2---3----4----5----6----7----8----9----10-------
-	//-----------------------dim1-dim2-----------------------------------
-	//-----------------------dim1----------------------------------------
+	$cols = array(0, 75, 135, 162, 212, 257, 302, 345, 405, 465, 525);
+	//------------0--1---2----3----4----5----6----7----8----9----10------
+	//----------------------------------dim1-dim2------------------------
+	//----------------------------------dim1-----------------------------
 	//-------------------------------------------------------------------
 	$aligns = array('left', 'left', 'left',	'left',	'left',	'left',	'left',	'right', 'right', 'right');
 
 	if ($dim == 2)
-		$headers = array(_('Type'),	_(''), _('#'), _('Date'), _('Dimension')." 1", _('Dimension')." 2",
+		$headers = array(_('Type'),	_('Detail'), _('#'), _('Date'), _('Dim')." 1", _('Dim')." 2",
 			_('Person/Item'), _('Debit'),	_('Credit'), _('Balance'));
 	elseif ($dim == 1)
-		$headers = array(_('Type'),	_(''), _('#'), _('Date'), _('Dimension'), _('Person/Item'), "",
+		$headers = array(_('Type'),	_('Detail'), _('#'), _('Date'), _('Dim'), _('Person/Item'), "",
 			_('Debit'),	_('Credit'), _('Balance'));
 	else
-		$headers = array(_('Type'),	_(''), _('#'), _('Date'), _('Person/Item'), "", "",
+		$headers = array(_('Type'),	_('Detail'), _('#'), _('Date'), _('Person/Item'), "", "",
 			_('Debit'),	_('Credit'), _('Balance'));
 
 	if ($dim == 2)
@@ -278,6 +280,7 @@ function print_GL_transactions()
 				$total += $row_amount;
 
 				$rep->TextCol(0, 1, $systypes_array[$myrow["type"]], -2);
+				$rep->TextCol(1, 2, get_bank_trans_type_detail_view_str($myrow["type"], $myrow['bank_account_type'], $myrow["cheque_no"], $myrow["tt_ind"]));
 				$reference = $print_invoice_no ? $myrow['type_no'] : get_reference($myrow["type"], $myrow["type_no"]);
 				$rep->TextCol(2, 3,	$reference, -2);
 				$rep->DateCol(3, 4,	$myrow["tran_date"], true);

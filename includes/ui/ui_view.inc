@@ -213,6 +213,24 @@ function get_package_view_str($pkg, $label="", $icon=false, $class='', $id='')
 	return viewer_link($label, "includes/ui/view_package.php?id=$pkg", $class, $id, $icon);
 }
 
+//--------------------------------------------------------------------------------------
+
+function get_bank_trans_type_detail_view_str($type, $bank_account_type=null, $cheque_no='', $tt_ind=0)
+{
+	if ($type == ST_BANKPAYMENT) {
+		if ($bank_account_type == BAT_CASH) {
+			return "CSH";
+		} elseif ($bank_account_type == BAT_CREDIT) {
+			return "CC";
+		} elseif ($bank_account_type == BAT_CHEQUING) {
+			if ($cheque_no)
+				return "CHQ:" . $cheque_no;
+			elseif ($tt_ind)
+				return "TT";
+		}
+	}
+	return "";
+}
 
 //--------------------------------------------------------------------------------------
 

@@ -301,7 +301,7 @@ function add_bank_transfer($from_account, $to_account, $date_,
 //
 function write_bank_transaction($trans_type, $trans_no, $from_account, $items, $date_,
 	$person_type_id, $person_id, $person_detail_id,	$ref, $memo_, $use_transaction=true,
-    $settled_amount=null, $cheque_no="")
+    $settled_amount=null, $cheque_no="", $tt_ind="")
 {
 	global $Refs, $SysPrefs;
 
@@ -309,9 +309,9 @@ function write_bank_transaction($trans_type, $trans_no, $from_account, $items, $
 	if ($trans_type != ST_BANKPAYMENT && $trans_type != ST_BANKDEPOSIT)
 		display_db_error("Invalid type ($trans_type) sent to add_bank_transaction");
 
-	// we only allow cheque number for payments
-    if ($cheque_no != "" && $trans_type != ST_BANKPAYMENT)
-        display_db_error("Invalid type ($trans_type), only payments can have a cheque number");
+	// we only allow cheque number and TT for payments
+    if (($cheque_no || $tt_ind) && $trans_type != ST_BANKPAYMENT)
+        display_db_error("Invalid type ($trans_type), only a payment can have a cheque number or TT indicator");
 
 	$do_exchange_variance = false;
 	$exchanged = false;
@@ -321,7 +321,7 @@ function write_bank_transaction($trans_type, $trans_no, $from_account, $items, $
 	$args = func_get_args(); if (count($args) < 11) $args[] = true;
 	$args = (object)array_combine(array('trans_type', 'trans_no', 'from_account', 'items', 'date_',
 		'person_type_id', 'person_id', 'person_detail_id', 'ref', 'memo_', 'use_transaction', 'settled_amount',
-        'cheque_no'), $args);
+        'cheque_no', 'tt_ind'), $args);
 	hook_db_prewrite($args, $trans_type);
 	$aid = 0;
 	if ($trans_no) {
@@ -388,7 +388,7 @@ function write_bank_transaction($trans_type, $trans_no, $from_account, $items, $
     	$person_type_id, $person_id,
     	$currency,
     	"Cannot insert a source bank transaction",
-        0, $cheque_no);
+        0, $cheque_no, $tt_ind);
 	$total = 0;
 	foreach ($items->gl_items as $gl_item)
 	{

@@ -160,7 +160,10 @@ function get_gl_transactions_with_bank_detail($from_date, $to_date, $trans_no=0,
 			ba.account_type as bank_account_type, cm.account_name 
 		FROM ".TB_PREF."gl_trans gt
 			LEFT JOIN ".TB_PREF."voided v ON gt.type_no=v.id AND v.type=gt.type
-			LEFT OUTER JOIN ".TB_PREF."bank_trans bt ON gt.type = bt.type AND gt.type_no = bt.trans_no
+			LEFT OUTER JOIN ".TB_PREF."bank_trans bt ON gt.type = bt.type
+				AND gt.type_no = bt.trans_no
+				AND bt.type = 1
+				AND bt.amount <> 0
 			LEFT OUTER JOIN ".TB_PREF."bank_accounts ba ON bt.bank_act = ba.id,
 			".TB_PREF."chart_master cm
 		WHERE cm.account_code=gt.account

@@ -85,16 +85,18 @@ function get_gl_transactions_with_curr_filter($from_date, $to_date, $trans_no=0,
 	$to = date2sql($to_date);
 
 	$sql = "
-		SELECT glt.*, cm.account_name, COALESCE(ba.bank_curr_code, dtm.curr_code, sp.value) AS curr_code,
+		SELECT glt.*, cm.account_name, COALESCE(ba1.bank_curr_code, ba2.bank_curr_code, dtm.curr_code, sp.value) AS curr_code,
 			CASE WHEN glt.amount=0 THEN 0 ELSE COALESCE(bt.amount, glt.amount/dt.rate, glt.amount) END AS curr_amount,
-			bt.bank_act, bt.cheque_no, bt.tt_ind, ba.account_type as bank_account_type
+			bt.bank_act, bt.cheque_no, bt.tt_ind,
+			COALESCE(ba1.account_type, ba2.account_type) as bank_account_type
 		FROM ".TB_PREF."gl_trans glt
 			LEFT JOIN ".TB_PREF."voided v ON glt.type_no=v.id AND glt.type=v.type
-			LEFT OUTER JOIN ".TB_PREF."bank_accounts ba ON glt.account=ba.account_code
+			LEFT OUTER JOIN ".TB_PREF."bank_accounts ba1 ON glt.account=ba1.account_code
 			LEFT OUTER JOIN ".TB_PREF."bank_trans bt ON glt.type_no=bt.trans_no
 				AND glt.type=bt.type
-				AND bt.bank_act=ba.id
-				AND bt.id IN (SELECT MAX(id) FROM ".TB_PREF."bank_trans GROUP BY type, trans_no, bank_act)
+				AND ((bt.type=1 AND bt.amount<>0) OR (bt.bank_act=ba1.id AND
+					bt.id IN (SELECT MAX(id) FROM ".TB_PREF."bank_trans GROUP BY type, trans_no, bank_act)))
+			LEFT OUTER JOIN ".TB_PREF."bank_accounts ba2 ON bt.bank_act=ba2.id
 			LEFT OUTER JOIN ".TB_PREF."debtor_trans dt ON glt.type_no=dt.trans_no AND glt.type=dt.type
 			LEFT OUTER JOIN ".TB_PREF."debtors_master dtm ON dt.debtor_no=dtm.debtor_no,
 			".TB_PREF."sys_prefs sp,
@@ -104,7 +106,7 @@ function get_gl_transactions_with_curr_filter($from_date, $to_date, $trans_no=0,
 			AND ISNULL(v.date_)
 			AND glt.tran_date >= '$from'
 			AND glt.tran_date <= '$to'
-			AND COALESCE(ba.bank_curr_code, dtm.curr_code, sp.value) = '$currency'";
+			AND COALESCE(ba1.bank_curr_code, ba2.bank_curr_code, dtm.curr_code, sp.value) = '$currency'";
 
 	if (isset($show_voided_gl_trans) && $show_voided_gl_trans == 0)
 		$sql .= " AND glt.amount <> 0";

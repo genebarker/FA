@@ -341,6 +341,12 @@ $reports->addReport(RC_GL, 702, _('List of &Journal Entries'),
 			_('Destination') => 'DESTINATION'));
 //$reports->addReport(RC_GL, 703, _('GL Account Group Summary'),
 //	array(	_('Comments'),'TEXTBOX')));
+$reports->addReport(RC_GL, 720, _('&Cash Flow Statement'),
+	array(	_('Start Date') => 'DATEBEGIN',
+		_('End Date') => 'DATEENDM',
+		_('Comments') => 'TEXTBOX',
+		_('Orientation') => 'ORIENTATION',
+		_('Destination') => 'DESTINATION'));
 
 if ($dim == 2)
 {

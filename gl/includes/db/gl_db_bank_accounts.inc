@@ -79,7 +79,7 @@ function get_bank_account($id)
 function is_a_chequing_account($id)
 {
     $bank_account = get_bank_account($id);
-    return ($bank_account['account_type'] == BT_CHEQUE);
+    return ($bank_account['account_type'] == BAT_CHEQUING);
 }
 
 //---------------------------------------------------------------------------------------------

@@ -222,6 +222,9 @@ function get_bank_trans_type_detail_view_str($type, $bank_account_type=null, $ch
 			return "CSH";
 		} elseif ($bank_account_type == BAT_CREDIT) {
 			return "CC";
+		} elseif ($bank_account_type == BAT_SAVINGS) {
+			if ($tt_ind)
+				return "TT";
 		} elseif ($bank_account_type == BAT_CHEQUING) {
 			if ($cheque_no)
 				return "CHQ:" . $cheque_no;

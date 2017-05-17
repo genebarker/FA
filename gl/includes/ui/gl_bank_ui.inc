@@ -114,18 +114,21 @@ function display_bank_header(&$order)
 			$_POST['bank_account'] = get_default_supplier_bank_account($_POST['person_id']);
 		else
 			unset($_POST['bank_account']);
-	}		
-    
-    bank_accounts_list_row( $payment ? _("From:") : _("Into:"), 'bank_account', null, true);
-    if ($payment) {
-        if (is_a_chequing_account($_POST['bank_account'])) {
+	}
+
+	bank_accounts_list_row( $payment ? _("From:") : _("Into:"), 'bank_account', null, true);
+	if ($payment) {
+		if (is_a_savings_account($_POST['bank_account'])) {
+			check_row(_("TT Payment:"), 'tt_ind', $_POST['tt_ind']);
+		}
+		elseif (is_a_chequing_account($_POST['bank_account'])) {
 			check_row(_("TT Payment:"), 'tt_ind', $_POST['tt_ind']);
 			ref_row(_("Cheque no:"), 'cheque_no', '');
 		}
-        bank_balance_row($_POST['bank_account']);
-    }
+		bank_balance_row($_POST['bank_account']);
+	}
 
-        $bank_currency = get_bank_account_currency($_POST['bank_account']);
+	$bank_currency = get_bank_account_currency($_POST['bank_account']);
 
 	exchange_rate_display(get_company_currency(), $bank_currency, $_POST['date_']);
 

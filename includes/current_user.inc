@@ -604,6 +604,7 @@ function array_append(&$array, $elements)
 //
 function array_search_value($needle, $haystack, $valuekey=null)
 {
+	if (!is_array($haystack)) return null;
 	foreach($haystack as $key => $value) {
 		$val = isset($valuekey) ? @$value[$valuekey] : $value;
 		if ($needle == $val){

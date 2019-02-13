@@ -11,6 +11,7 @@
 ***********************************************************************/
 include_once($path_to_root . "/includes/ui.inc");
 include_once($path_to_root . "/includes/ui/items_cart.inc");
+include_once($path_to_root . "/includes/ui/ui_view.inc");
 
 //--------------------------------------------------------------------------------
 
@@ -26,6 +27,11 @@ function display_order_header(&$Order)
 	table_section(1, $qes ? "20%" : "");
 
     date_row(_("Date:"), 'date_', '', $new);
+	currencies_list_row(_("Currency:"), 'entry_currency', null, true);
+	$gl_currency = get_company_pref('curr_default');
+	$entry_currency = get_post('entry_currency');
+	$exchange_rate = get_exchange_rate_from_to($gl_currency, $entry_currency, get_post('date_'));
+	label_row(_("Exchange Rate:"), "<span>$exchange_rate $gl_currency = 1 $entry_currency</span>");
 
 	table_section(2, $qes ? "20%" : "50%");
 	ref_row(_("Reference:"), 'ref', '');

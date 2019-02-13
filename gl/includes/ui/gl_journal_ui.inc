@@ -11,7 +11,6 @@
 ***********************************************************************/
 include_once($path_to_root . "/includes/ui.inc");
 include_once($path_to_root . "/includes/ui/items_cart.inc");
-include_once($path_to_root . "/includes/ui/ui_view.inc");
 
 //--------------------------------------------------------------------------------
 

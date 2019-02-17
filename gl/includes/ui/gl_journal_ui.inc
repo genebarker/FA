@@ -78,19 +78,23 @@ function display_gl_items($title, &$order)
 
 	display_heading($title);
 
+	$gl_currency = get_company_pref('curr_default');
+	$entry_currency = get_post('entry_currency');
+	$exchange_rate = get_exchange_rate_from_to($gl_currency, $entry_currency, get_post('date_'));
+
 	$dim = get_company_pref('use_dimension');
 
     div_start('items_table');
 	start_table(TABLESTYLE, "width='95%'");
 	if ($dim == 2)
-		$th = array(_("Account Code"), _("Account Description"), _("Dimension")." 1",
-			_("Dimension")." 2", _("Debit"), _("Credit"), _("Memo"), "");
+		$th = array(_("Account Code"), _("Account Description"), _("Dimension")." 1", _("Dimension")." 2");
 	else if ($dim == 1)
-		$th = array(_("Account Code"), _("Account Description"), _("Dimension"),
-			_("Debit"), _("Credit"), _("Memo"), "");
+		$th = array(_("Account Code"), _("Account Description"), _("Dimension"));
 	else
-		$th = array(_("Account Code"), _("Account Description"),
-			_("Debit"), _("Credit"), _("Memo"), "");
+		$th = array(_("Account Code"), _("Account Description"));
+
+	$currency_suffix = ($entry_currency == $gl_currency ? "" : " ($entry_currency)");
+	array_push($th, _("Debit") . $currency_suffix, _("Credit") . $currency_suffix, _("Memo"), "");
 
 	if (count($order->gl_items)) $th[] = '';
 

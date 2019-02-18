@@ -80,6 +80,7 @@ function display_gl_items($title, &$order)
 
 	$gl_currency = get_company_pref('curr_default');
 	$entry_currency = get_post('entry_currency');
+	$using_home_currency = ($gl_currency == $entry_currency);
 	$exchange_rate = get_exchange_rate_from_to($gl_currency, $entry_currency, get_post('date_'));
 
 	$dim = get_company_pref('use_dimension');
@@ -93,7 +94,7 @@ function display_gl_items($title, &$order)
 	else
 		$th = array(_("Account Code"), _("Account Description"));
 
-	$currency_suffix = ($entry_currency == $gl_currency ? "" : " ($entry_currency)");
+	$currency_suffix = ($using_home_currency ? "" : " ($entry_currency)");
 	array_push($th, _("Debit") . $currency_suffix, _("Credit") . $currency_suffix, _("Memo"), "");
 
 	if (count($order->gl_items)) $th[] = '';
@@ -114,15 +115,16 @@ function display_gl_items($title, &$order)
    				label_cell(get_dimension_string($item->dimension_id, true));
     		if ($dim > 1)
    				label_cell(get_dimension_string($item->dimension2_id, true));
-    		if ($item->amount > 0)
+			$calculated_amount = $using_home_currency ? $item->amount : $item->amount / $exchange_rate;
+			if ($calculated_amount > 0)
     		{
-    			amount_cell(abs($item->amount));
+    			amount_cell(abs($calculated_amount));
     			label_cell("");
     		}	
     		else
     		{
     			label_cell("");
-    			amount_cell(abs($item->amount));
+    			amount_cell(abs($calculated_amount));
     		}	
 			label_cell($item->reference);
 
@@ -171,15 +173,22 @@ function gl_edit_item_controls(&$order, $dim, $Index=null)
 		$_POST['code_id'] = $item->code_id;
 		$_POST['dimension_id'] = $item->dimension_id;
 		$_POST['dimension2_id'] = $item->dimension2_id;
-		if ($item->amount > 0)
+
+		$gl_currency = get_company_pref('curr_default');
+		$entry_currency = get_post('entry_currency');
+		$using_home_currency = ($gl_currency == $entry_currency);
+		$exchange_rate = get_exchange_rate_from_to($gl_currency, $entry_currency, get_post('date_'));
+
+		$calculated_amount = $using_home_currency ? $item->amount : $item->amount / $exchange_rate;
+		if ($calculated_amount > 0)
 		{
-			$_POST['AmountDebit'] = price_format($item->amount);
+			$_POST['AmountDebit'] = price_format($calculated_amount);
 			$_POST['AmountCredit'] = "";
 		}
 		else
 		{
 			$_POST['AmountDebit'] = "";
-			$_POST['AmountCredit'] = price_format(abs($item->amount));
+			$_POST['AmountCredit'] = price_format(abs($calculated_amount));
 		}	
 		$_POST['description'] = $item->description;
 		$_POST['LineMemo'] = $item->reference;

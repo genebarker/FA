@@ -271,7 +271,7 @@ function handle_update_item()
 		$using_home_currency = ($gl_currency == $entry_currency);
 		$exchange_rate = get_exchange_rate_from_to($gl_currency, $entry_currency, $_POST['date_']);
 	
-		$calculated_amount = $using_home_currency ? $amount : $amount * $exchange_rate;
+		$calculated_amount = $using_home_currency ? $amount : round($amount * $exchange_rate, 2);
 
 		$_SESSION['journal_items']->update_gl_item($_POST['Index'], $_POST['code_id'], 
     	    $_POST['dimension_id'], $_POST['dimension2_id'], $calculated_amount, $_POST['LineMemo']);
@@ -304,7 +304,7 @@ function handle_new_item()
 	$using_home_currency = ($gl_currency == $entry_currency);
 	$exchange_rate = get_exchange_rate_from_to($gl_currency, $entry_currency, $_POST['date_']);
 
-	$calculated_amount = $using_home_currency ? $amount : $amount * $exchange_rate;
+	$calculated_amount = $using_home_currency ? $amount : round($amount * $exchange_rate, 2);
 
 	$_SESSION['journal_items']->add_gl_item($_POST['code_id'], $_POST['dimension_id'],
 		$_POST['dimension2_id'], $calculated_amount, $_POST['LineMemo']);

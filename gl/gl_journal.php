@@ -337,7 +337,8 @@ start_form();
 
 display_order_header($_SESSION['journal_items']);
 
-display_note("New / updated items post to the GL in the Home Currency (" . get_company_pref('curr_default') . ") using the shown exchange rate.<br><br>");
+display_note("New and updated items are converted to the Home Currency (" . get_company_pref('curr_default') . ") using the displayed exchange rate.<br>" .
+			 "Switch to the Home Currency to fine-tune conversion (i.e. apply a remainder to the last item).<br><br>");
 
 start_table(TABLESTYLE2, "width='90%'", 10);
 start_row();

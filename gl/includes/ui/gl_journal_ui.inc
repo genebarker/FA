@@ -26,6 +26,11 @@ function display_order_header(&$Order)
 	table_section(1, $qes ? "20%" : "");
 
     date_row(_("Date:"), 'date_', '', $new);
+	currencies_list_row(_("Currency:"), 'entry_currency', null, true);
+	$gl_currency = get_company_pref('curr_default');
+	$entry_currency = get_post('entry_currency');
+	$exchange_rate = get_exchange_rate_from_to($gl_currency, $entry_currency, get_post('date_'));
+	label_row(_("Exchange Rate:"), "<span>$exchange_rate $gl_currency = 1 $entry_currency</span>");
 
 	table_section(2, $qes ? "20%" : "50%");
 	ref_row(_("Reference:"), 'ref', '');
@@ -73,19 +78,29 @@ function display_gl_items($title, &$order)
 
 	display_heading($title);
 
+	$gl_currency = get_company_pref('curr_default');
+	$entry_currency = get_post('entry_currency');
+	$using_home_currency = ($gl_currency == $entry_currency);
+	$exchange_rate = get_exchange_rate_from_to($gl_currency, $entry_currency, get_post('date_'));
+
 	$dim = get_company_pref('use_dimension');
 
     div_start('items_table');
 	start_table(TABLESTYLE, "width='95%'");
 	if ($dim == 2)
-		$th = array(_("Account Code"), _("Account Description"), _("Dimension")." 1",
-			_("Dimension")." 2", _("Debit"), _("Credit"), _("Memo"), "");
+		$th = array(_("Account Code"), _("Account Description"), _("Dimension")." 1", _("Dimension")." 2");
 	else if ($dim == 1)
-		$th = array(_("Account Code"), _("Account Description"), _("Dimension"),
-			_("Debit"), _("Credit"), _("Memo"), "");
+		$th = array(_("Account Code"), _("Account Description"), _("Dimension"));
 	else
-		$th = array(_("Account Code"), _("Account Description"),
-			_("Debit"), _("Credit"), _("Memo"), "");
+		$th = array(_("Account Code"), _("Account Description"));
+
+	if ($using_home_currency)
+		array_push($th, _("Debit"), _("Credit"));
+	else
+		array_push($th, _("Debit ($entry_currency)"), _("Credit ($entry_currency)"),
+						_("GL Debit ($gl_currency)"), _("GL Credit ($gl_currency)"));
+
+	array_push($th, _("Memo"), "");
 
 	if (count($order->gl_items)) $th[] = '';
 
@@ -105,16 +120,29 @@ function display_gl_items($title, &$order)
    				label_cell(get_dimension_string($item->dimension_id, true));
     		if ($dim > 1)
    				label_cell(get_dimension_string($item->dimension2_id, true));
-    		if ($item->amount > 0)
+			$calculated_amount = $using_home_currency ? $item->amount : $item->amount / $exchange_rate;
+			if ($calculated_amount > 0)
     		{
-    			amount_cell(abs($item->amount));
+    			amount_cell(abs($calculated_amount));
     			label_cell("");
     		}	
     		else
     		{
     			label_cell("");
-    			amount_cell(abs($item->amount));
+    			amount_cell(abs($calculated_amount));
     		}	
+			if (!$using_home_currency) {
+				if ($item->amount > 0)
+				{
+					amount_cell(abs($item->amount));
+					label_cell("");
+				}	
+				else
+				{
+					label_cell("");
+					amount_cell(abs($item->amount));
+				}	
+			}
 			label_cell($item->reference);
 
 			edit_button_cell("Edit$line", _("Edit"),
@@ -137,6 +165,10 @@ function display_gl_items($title, &$order)
 		$colspan = ($dim == 2 ? "4" : ($dim == 1 ? "3" : "2"));
 		start_row();
 		label_cell(_("Total"), "align=right colspan=" . $colspan);
+		if (!$using_home_currency) {
+			amount_cell(converted_items_total_debit($order, $exchange_rate));
+			amount_cell(abs(converted_items_total_credit($order, $exchange_rate)));
+		}
 		amount_cell($order->gl_items_total_debit());
 		amount_cell(abs($order->gl_items_total_credit()));
 		label_cell('', "colspan=3");
@@ -147,12 +179,39 @@ function display_gl_items($title, &$order)
 	div_end();
 }
 
+function converted_items_total_debit(&$order, $exchange_rate)
+{
+	$total = 0;
+	foreach ($order->gl_items as $gl_item)
+	{
+		if ($gl_item->amount > 0)
+			$total += round($gl_item->amount / $exchange_rate, 2);
+	}
+	return $total;
+}
+
+function converted_items_total_credit(&$order, $exchange_rate)
+{
+	$total = 0;
+	foreach ($order->gl_items as $gl_item)
+	{
+		if ($gl_item->amount < 0)
+			$total += round($gl_item->amount / $exchange_rate, 2);
+	}
+	return $total;
+}
+
 //---------------------------------------------------------------------------------
 
 function gl_edit_item_controls(&$order, $dim, $Index=null)
 {
 	global $Ajax;
 	start_row();
+
+	$gl_currency = get_company_pref('curr_default');
+	$entry_currency = get_post('entry_currency');
+	$using_home_currency = ($gl_currency == $entry_currency);
+	$exchange_rate = get_exchange_rate_from_to($gl_currency, $entry_currency, get_post('date_'));
 
 	$id = find_submit('Edit');
 	if ($Index != -1 && $Index == $id)
@@ -162,16 +221,18 @@ function gl_edit_item_controls(&$order, $dim, $Index=null)
 		$_POST['code_id'] = $item->code_id;
 		$_POST['dimension_id'] = $item->dimension_id;
 		$_POST['dimension2_id'] = $item->dimension2_id;
-		if ($item->amount > 0)
+
+		$calculated_amount = $using_home_currency ? $item->amount : $item->amount / $exchange_rate;
+		if ($calculated_amount > 0)
 		{
-			$_POST['AmountDebit'] = price_format($item->amount);
+			$_POST['AmountDebit'] = price_format($calculated_amount);
 			$_POST['AmountCredit'] = "";
 		}
 		else
 		{
 			$_POST['AmountDebit'] = "";
-			$_POST['AmountCredit'] = price_format(abs($item->amount));
-		}	
+			$_POST['AmountCredit'] = price_format(abs($calculated_amount));
+		}
 		$_POST['description'] = $item->description;
 		$_POST['LineMemo'] = $item->reference;
 
@@ -213,6 +274,10 @@ function gl_edit_item_controls(&$order, $dim, $Index=null)
 
 	small_amount_cells(null, 'AmountDebit');
 	small_amount_cells(null, 'AmountCredit');
+	if (!$using_home_currency) {
+		label_cell("");
+		label_cell("");
+	}
 	text_cells_ex(null, 'LineMemo', 35, 255);
 
 	if ($id != -1)

@@ -266,8 +266,15 @@ function handle_update_item()
     	else
     		$amount = -input_num('AmountCredit');
 
-    	$_SESSION['journal_items']->update_gl_item($_POST['Index'], $_POST['code_id'], 
-    	    $_POST['dimension_id'], $_POST['dimension2_id'], $amount, $_POST['LineMemo']);
+		$gl_currency = get_company_pref('curr_default');
+		$entry_currency = $_POST['entry_currency'];
+		$using_home_currency = ($gl_currency == $entry_currency);
+		$exchange_rate = get_exchange_rate_from_to($gl_currency, $entry_currency, $_POST['date_']);
+	
+		$calculated_amount = $using_home_currency ? $amount : round($amount * $exchange_rate, 2);
+
+		$_SESSION['journal_items']->update_gl_item($_POST['Index'], $_POST['code_id'], 
+    	    $_POST['dimension_id'], $_POST['dimension2_id'], $calculated_amount, $_POST['LineMemo']);
     }
 	line_start_focus();
 }
@@ -291,9 +298,16 @@ function handle_new_item()
 		$amount = input_num('AmountDebit');
 	else
 		$amount = -input_num('AmountCredit');
-	
+
+	$gl_currency = get_company_pref('curr_default');
+	$entry_currency = $_POST['entry_currency'];
+	$using_home_currency = ($gl_currency == $entry_currency);
+	$exchange_rate = get_exchange_rate_from_to($gl_currency, $entry_currency, $_POST['date_']);
+
+	$calculated_amount = $using_home_currency ? $amount : round($amount * $exchange_rate, 2);
+
 	$_SESSION['journal_items']->add_gl_item($_POST['code_id'], $_POST['dimension_id'],
-		$_POST['dimension2_id'], $amount, $_POST['LineMemo']);
+		$_POST['dimension2_id'], $calculated_amount, $_POST['LineMemo']);
 	line_start_focus();
 }
 
@@ -322,6 +336,9 @@ if (isset($_POST['go']))
 start_form();
 
 display_order_header($_SESSION['journal_items']);
+
+display_note("New and updated items are converted to the Home Currency (" . get_company_pref('curr_default') . ") using the displayed exchange rate.<br>" .
+			 "Switch to the Home Currency to fine-tune conversion (i.e. apply a remainder to the last item).<br><br>");
 
 start_table(TABLESTYLE2, "width='90%'", 10);
 start_row();

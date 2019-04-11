@@ -547,18 +547,10 @@ function write_journal_entries(&$cart, $reverse, $use_transaction=true)
 
 	foreach ($cart->gl_items as $journal_item)
 	{
-		// post to first found bank account using given gl acount code.
-		$is_bank_to = is_bank_account($journal_item->code_id);
-
 		add_gl_trans($trans_type, $trans_id, $date_, $journal_item->code_id,
 			$journal_item->dimension_id, $journal_item->dimension2_id,
 			$journal_item->reference, $journal_item->amount);
-		if ($is_bank_to)
-		{
-			add_bank_trans($trans_type, $trans_id, $is_bank_to, $ref,
-				$date_, $journal_item->amount,	0, "", get_company_currency(),
-				"Cannot insert a destination bank transaction");
-		}
+
 		// store tax details if the gl account is a tax account
 		add_gl_tax_details($journal_item->code_id, 
 			ST_JOURNAL, $trans_id, $journal_item->amount, 1, $date_, $memo_);
@@ -583,18 +575,10 @@ function write_journal_entries(&$cart, $reverse, $use_transaction=true)
 
 		foreach ($cart->gl_items as $journal_item)
 		{
-			$is_bank_to = is_bank_account($journal_item->code_id);
-
 			add_gl_trans($trans_type, $trans_id_reverse, $reversingDate,
 				$journal_item->code_id, $journal_item->dimension_id, $journal_item->dimension2_id,
 				$journal_item->reference, -$journal_item->amount);
-			if ($is_bank_to)
-			{
-				add_bank_trans($trans_type, $trans_id_reverse, $is_bank_to, $ref,
-					$reversingDate, -$journal_item->amount,
-					0, "", get_company_currency(),
-					"Cannot insert a destination bank transaction");
-			}
+
 			// store tax details if the gl account is a tax account
 			add_gl_tax_details($journal_item->code_id, 
 				ST_JOURNAL, $trans_id, $journal_item->amount, 1, $reversingDate, $memo_);

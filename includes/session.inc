@@ -131,10 +131,18 @@ function kill_login()
 function login_fail()
 {
 	global $path_to_root;
-	
+
+	if (extension_is_active('password')) {
+		$pwe = get_extension('password');
+		$fail_message = $pwe->lastLoginAttempt->message;
+	} else {
+		$fail_message = "The user and password combination is not valid " .
+						"for the system.";
+	}
+
 	header("HTTP/1.1 401 Authorization Required");
-	echo "<center><br><br><font size='5' color='red'><b>" . _("Incorrect Password") . "<b></font><br><br>";
-	echo "<b>" . _("The user and password combination is not valid for the system.") . "<b><br><br>";
+	echo "<center><br><br><font size='5' color='red'><b>" . _("Login Attempt Failed") . "<b></font><br><br>";
+	echo "<b>" . $fail_message . "<b><br><br>";
 
 	echo _("If you are not an authorized user, please contact your system administrator to obtain an account to enable you to use the system.");
 	echo "<br><a href='$path_to_root/index.php'>" . _("Try again") . "</a>";
@@ -142,6 +150,16 @@ function login_fail()
 
 	kill_login();
 	die();
+}
+
+function extension_is_active($extension_name) {
+	global $Hooks;
+	return array_key_exists($extension_name, $Hooks);
+}
+
+function get_extension($extension_name) {
+	global $Hooks;
+	return $Hooks[$extension_name];
 }
 
 function password_reset_fail()

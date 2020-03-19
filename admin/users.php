@@ -66,9 +66,27 @@ if (($Mode=='ADD_ITEM' || $Mode=='UPDATE_ITEM') && check_csrf_token())
     			get_post(array('user_id', 'real_name', 'phone', 'email', 'role_id', 'language',
 					'print_profile', 'rep_popup' => 0, 'pos')));
 
-    		if ($_POST['password'] != "")
-    			update_user_password($selected_id, $_POST['user_id'], md5($_POST['password']));
-
+    		if ($_POST['password'] != "") {
+				if (extension_is_active('password')) {
+					$pwe = get_extension('password');
+					$is_temporary_pw = true;
+					$success = $pwe->update_password(
+						$_POST['user_id'],
+						null,
+						$_POST['password'],
+						$is_temporary_pw
+					);
+					if (!$success) {
+						$fail_message = (
+							'The password was NOT updated. Reason: ' .
+							$pwe->lastLoginAttempt->message
+						);
+						display_warning($fail_message);
+					}
+				} else {
+    				update_user_password($selected_id, $_POST['user_id'], md5($_POST['password']));
+				}
+			}
     		display_notification_centered(_("The selected user has been updated."));
     	} 
     	else 

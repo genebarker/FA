@@ -67,10 +67,25 @@ if (isset($_POST['UPDATE_ITEM']) && check_csrf_token())
 		if ($allow_demo_mode) {
 		    display_warning(_("Password cannot be changed in demo mode."));
 		} else {
-			update_user_password($_SESSION["wa_current_user"]->user, 
-				$_SESSION["wa_current_user"]->username,
-				md5($_POST['password']));
-		    display_notification(_("Your password has been updated."));
+			if (extension_is_active('password')) {
+				$pwe = get_extension('password');
+				$success = $pwe->update_password(
+					$_SESSION['wa_current_user']->loginname,
+					$_POST['cur_password'],
+					$_POST['password']
+				);
+				if ($success) {
+					display_notification(_("Your password has been updated."));
+				} else {
+					$fail_message = $pwe->lastLoginAttempt->message;
+					display_warning($fail_message);
+				}
+			} else {
+				update_user_password($_SESSION["wa_current_user"]->user,
+					$_SESSION["wa_current_user"]->username,
+					md5($_POST['password']));
+				display_notification(_("Your password has been updated."));
+			}
 		}
 		$Ajax->activate('_page_body');
 	}

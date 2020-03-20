@@ -57,7 +57,7 @@ class current_user
 		$this->company = (int)$company;
 	}
 
-	function login($company, $loginname, $password)
+	function login($company, $loginname, $password, $new_password = null)
 	{
 		global $security_areas, $security_groups, $security_headings, $path_to_root, $login_delay;
 
@@ -69,7 +69,8 @@ class current_user
 		// Use external authentication source if any.
 		// Keep in mind you need to have user data set for $loginname
 		// in FA users table anyway to successfully log in.
-		$Auth_Result = hook_authenticate($loginname, $password);
+		$opts = $new_password == null ? $password : [$password, $new_password];
+		$Auth_Result = hook_authenticate($loginname, $opts);
 
 		if (!isset($Auth_Result))	// if not used: standard method
 			$Auth_Result = get_user_auth($loginname, md5($password));

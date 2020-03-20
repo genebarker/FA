@@ -96,6 +96,10 @@ function defaultCompany()
 
 	password_row(_("Password:"), 'password', $password);
 
+	if (extension_is_active('password')) {
+		password_row(_("New password (optional):"), 'new_password', '');
+	}
+
 	if ($login_timeout) {
 		hidden('company_login_name', $_SESSION["wa_current_user"]->company);
 	} else {

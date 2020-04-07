@@ -70,11 +70,9 @@ if (($Mode=='ADD_ITEM' || $Mode=='UPDATE_ITEM') && check_csrf_token())
 				if (extension_is_active('password')) {
 					$pwe = get_extension('password');
 					$is_temporary_pw = true;
-					$success = $pwe->update_password(
+					$success = $pwe->reset_password(
 						$_POST['user_id'],
-						null,
-						$_POST['password'],
-						$is_temporary_pw
+						$_POST['password']
 					);
 					if (!$success) {
 						$fail_message = (

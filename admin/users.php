@@ -77,7 +77,7 @@ if (($Mode=='ADD_ITEM' || $Mode=='UPDATE_ITEM') && check_csrf_token())
 					if (!$success) {
 						$fail_message = (
 							'The password was NOT updated. Reason: ' .
-							$pwe->lastLoginAttempt->message
+							$pwe->lastResult->message
 						);
 						display_warning($fail_message);
 					}

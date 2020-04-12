@@ -134,7 +134,7 @@ function login_fail()
 
 	if (extension_is_active('password')) {
 		$pwe = get_extension('password');
-		$fail_message = $pwe->lastLoginAttempt->message;
+		$fail_message = $pwe->lastResult->message;
 	} else {
 		$fail_message = "The user and password combination is not valid " .
 						"for the system.";

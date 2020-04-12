@@ -69,15 +69,14 @@ if (isset($_POST['UPDATE_ITEM']) && check_csrf_token())
 		} else {
 			if (extension_is_active('password')) {
 				$pwe = get_extension('password');
-				$success = $pwe->update_password(
-					$_SESSION['wa_current_user']->loginname,
-					$_POST['cur_password'],
+				$success = $pwe->change_password(
+					$_SESSION['wa_current_user']->username,
 					$_POST['password']
 				);
 				if ($success) {
 					display_notification(_("Your password has been updated."));
 				} else {
-					$fail_message = $pwe->lastLoginAttempt->message;
+					$fail_message = $pwe->lastResult->message;
 					display_warning($fail_message);
 				}
 			} else {
